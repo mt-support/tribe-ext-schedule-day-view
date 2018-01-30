@@ -41,6 +41,7 @@ class Tribe__Extension__Example extends Tribe__Extension {
 
 	public function init() {
 		foreach ( self::SINGLE_TYPES as $type ) {
+			//tribe_events_template_paths
 			add_filter( 'tribe_get_template_part_day_single_' . $type, array( $this, 'filter_day_view' ), 10, 5 );
 		}
 
