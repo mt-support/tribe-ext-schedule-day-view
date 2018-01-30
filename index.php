@@ -30,23 +30,19 @@ if ( ! class_exists( 'Tribe__Extension' ) ) {
  */
 class Tribe__Extension__Example extends Tribe__Extension {
 
-	/**
-	 * Setup the Extension's properties.
-	 *
-	 * This always executes even if the required plugins are not present.
-	 */
-	public function construct() {
-		// Requirements and other properties such as the extension homepage can be defined here.
-		// Examples:
-		//
-		//     $this->add_required_plugin( 'Tribe__Events__Main', '4.3' );
-		//     $this->set_url( 'https://theeventscalendar.com/extensions/example/' );
-   }
+	const SINGLE_TYPES = [
+		'event',
+		'featured',
+	];
 
-	/**
-	 * Extension initialization and hooks.
-	 */
+	public function construct() {
+		parent::construct();
+	}
+
 	public function init() {
-		// Insert custom code here
-   }
+		foreach ( self::SINGLE_TYPES as $type ) {
+			add_filter( 'tribe_get_template_part_day_single_' . $type, array( $this, 'filter_day_view' ), 10, 5 );
+		}
+
+	}
 }
