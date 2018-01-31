@@ -1,0 +1,82 @@
+# OS generated files #
+######################
+
+.DS_Store*
+ehthumbs.db
+._*
+*~
+.svn
+.cvs
+*.bak
+*.swp
+Thumbs.db
+.DS_Store
+.idea
+
+# Vim generated files #
+#######################
+
+*.un~
+
+# WordPress #
+#############
+
+local-config.php
+cache-config.php
+tests-config.php
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/backups/
+wp-content/cache/
+wp-content/wp-cache-config.php
+wp-content/tests/
+wp-content/logs/
+
+wp-content/plugins/fakerpress/
+wp-content/plugins/better-search-replace/
+
+# Packages #
+############
+
+*.7z
+*.dmg
+*.gz
+*.bz2
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.tgz
+
+# Logs and databases #
+######################
+
+*.log
+*.sql
+
+# Processors #
+##############
+
+.sass-cache
+.scssc
+codekit-config.json
+compass_app_log.txt
+dev/node_modules/
+dev/bower_components/
+dev/vendor/
+dev/composer.phar
+local-config.json
+dev/docker/mysql/*
+!dev/docker/mysql/.gitkeep
+
+# Theme #
+#######################
+
+**/node_modules/
+**/bower_components/
+**/__coverage__/
+dev_components/react-app/test/__coverage__/
+dev/deploy/.deploy
