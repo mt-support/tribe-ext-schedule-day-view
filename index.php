@@ -2,11 +2,13 @@
 /**
  * Plugin Name:     The Events Calendar Extension: Schedule Day View
  * Description:     Overrides The Events Calendar's Day View with a Schedule Day View, displaying events within All
- * Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now. Version: 1.0.0
+ * Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now.
+ * Version:         1.0.0
  * Extension Class: Tribe__Extension__Schedule_Day_View
- * Author:          Modern Tribe, Inc. Author URI:
- * http://m.tri.be/1971 License:         GPL version 3 or any later version License URI:
- * https://www.gnu.org/licenses/gpl-3.0.html
+ * Author:          Modern Tribe, Inc.
+ * Author URI:      http://m.tri.be/1971
+ * License:         GPL version 3 or any later version
+ * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  *
  *     This plugin is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -73,8 +75,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	public function register_assets() {
 		$dir = trailingslashit( plugin_dir_path( __FILE__ ) ) . 'src/resources/';
 
-		wp_register_style( self::PREFIX . 'css', $dir . 'css/style.css', array( 'tribe-common' ), $this->get_version() );
-		wp_register_script( self::PREFIX . 'js', $dir . 'js/script.js', array( 'calendar-script', 'tribe-moment' ), $this->get_version(), true );
+		wp_register_style( self::PREFIX, $dir . 'css/style.css', array( 'tribe-events-calendar-style' ), $this->get_version() );
+		wp_register_script( self::PREFIX . 'js', $dir . 'js/script.js', array( 'tribe-moment' ), $this->get_version(), true );
 	}
 
 	/**
@@ -82,8 +84,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 */
 	public function load_assets() {
 		if ( tribe_is_day() ) {
-			wp_enqueue_style(self::PREFIX . 'css');
-			wp_enqueue_script(self::PREFIX . 'js');
+			wp_enqueue_style( self::PREFIX . 'css' );
+			wp_enqueue_script( self::PREFIX . 'js' );
 		}
 	}
 
@@ -96,16 +98,16 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 */
 	protected function get_time_of_day_ranges() {
 		return [
-			__( 'Morning', 'tribe-ext-schedule-day-view' ) => [
+			__( 'Morning', 'tribe-ext-schedule-day-view' )   => [
 				6, 7, 8, 9, 10, 11,
 			],
 			__( 'Afternoon', 'tribe-ext-schedule-day-view' ) => [
 				12, 13, 14, 15, 16,
 			],
-			__( 'Evening', 'tribe-ext-schedule-day-view' ) => [
+			__( 'Evening', 'tribe-ext-schedule-day-view' )   => [
 				17, 18, 19, 20,
 			],
-			__( 'Night', 'tribe-ext-schedule-day-view' ) => [
+			__( 'Night', 'tribe-ext-schedule-day-view' )     => [
 				21, 22, 23, 0, 1, 2, 3, 4, 5,
 			],
 		];
