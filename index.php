@@ -59,7 +59,10 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		// Load assets for main archive Day View
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
 		// Load assets for PRO shortcode
-		add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'load_assets_in_day_view_shortcode' ) );
+		add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array(
+			$this,
+			'load_assets_in_day_view_shortcode',
+		) );
 		$this->setup_plain_language_redirect();
 	}
 
@@ -166,8 +169,12 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 				} else {
 					$post->timeslot = $this->get_timeslot( $post->timeslot );
 				}
-				$post->timeslots = $this->get_js_timeslots( $post->timeslot, $post->ID );
-				$post->is_active_on_load = $this->active( [ 'all_day' => ( 'All Day' == $post->timeslot ), 'timeslots' => $post->timeslots, 'group_name' => $post->timeslot ] );
+				$post->timeslots         = $this->get_js_timeslots( $post->timeslot, $post->ID );
+				$post->is_active_on_load = $this->active( [
+					'all_day'    => ( 'All Day' == $post->timeslot ),
+					'timeslots'  => $post->timeslots,
+					'group_name' => $post->timeslot,
+				] );
 				if ( $post->is_active_on_load ) {
 					$active_timeslots[] = $post->timeslot;
 				}
@@ -201,13 +208,14 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 				get_post_meta( $id, "_EventStartDateUTC", true ),
 				get_post_meta( $id, "_EventTimezone", true )
 			);
-			$end = sprintf(
+			$end   = sprintf(
 				'%s %s',
 				get_post_meta( $id, "_EventEndDateUTC", true ),
 				get_post_meta( $id, "_EventTimezone", true )
 			);
 
-			sleep(0);
+			sleep( 0 );
+
 			return [
 				'start' => strtotime( $start ),
 				'end'   => strtotime( $end ),
@@ -257,7 +265,9 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			return true;
 		}
 
-		if ( time() >= $args['timeslots']['start'] && time()< $args['timeslots']['end']) {
+		$offset = get_option( 'gmt_offset' );
+		$time   = time() - ( HOUR_IN_SECONDS * $offset );
+		if ( $time >= $args['timeslots']['start'] && $time < $args['timeslots']['end'] ) {
 			return true;
 		}
 
@@ -275,11 +285,11 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			__( 'events/yesterday', 'tribe-ext-schedule-day-view' )               => 'index.php?post_type=tribe_events&eventDateModified=-1',
 			__( 'events/nextweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=1&eventDisplay=week',
 			__( 'events/lastweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=-1&eventDisplay=week',
-			__( 'events/nextmonth', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventMonthModified=1&eventDisplay=month',
-			__( 'events/lastmonth', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventMonthModified=-1&eventDisplay=month',
+			__( 'events/nextmonth', 'tribe-ext-schedule-day-view' )               => 'index.php?post_type=tribe_events&eventMonthModified=1&eventDisplay=month',
+			__( 'events/lastmonth', 'tribe-ext-schedule-day-view' )               => 'index.php?post_type=tribe_events&eventMonthModified=-1&eventDisplay=month',
 			__( 'events/today', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventDateModified=$matches[1]',
 			__( 'events/week', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?'  => 'index.php?post_type=tribe_events&eventWeekModified=$matches[1]&eventDisplay=week',
-			__( 'events/month', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?'  => 'index.php?post_type=tribe_events&eventMonthModified=$matches[1]&eventDisplay=month',
+			__( 'events/month', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventMonthModified=$matches[1]&eventDisplay=month',
 		];
 
 		add_filter( 'rewrite_rules_array', function ( $rules ) use ( $plane_language ) {
