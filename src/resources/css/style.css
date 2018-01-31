@@ -15,6 +15,10 @@
 	margin-bottom: 18px;
 }
 
+.tribe-events-day .tribe-events-list .tribe-events-loop .tribe-event-featured .tribe-events-list-event-title {
+	margin-top: 0;
+}
+
 .tribe-events-day .tribe-events-list .tribe-events-list-event-title {
 	font-size: 1.25em;
 }
