@@ -28,11 +28,6 @@
 			tribe_timezone = $container.data( 'tribe-timezone' ),
 			tribe_time_on_load = $container.data( 'tribe-now' );
 
-		// finish on load: open or not, active events or not
-		// styles / refinement: skeleton, full, theme
-		// stretch goals
-		// bring JS closer in line
-		// for ajax pagination?
 
 		/**
 		 * @function

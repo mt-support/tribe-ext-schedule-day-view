@@ -24,15 +24,15 @@ $today               = Tribe__Extension__Schedule_Day_View::today();
 ?>
 
 <div
-    id="tribe-events-day"
-    class="tribe-events-loop"
-    data-tribe-timezone="<?php echo esc_attr( Tribe__Events__Timezones::wp_timezone_string() ); ?>"
-    data-tribe-now="<?php echo esc_attr( time() ); ?>"
+	id="tribe-events-day"
+	class="tribe-events-loop"
+	data-tribe-timezone="<?php echo esc_attr( Tribe__Events__Timezones::wp_timezone_string() ); ?>"
+	data-tribe-now="<?php echo esc_attr( time() ); ?>"
 >
 
 	<div class="tribe-events-day-time-slot">
 
-	<?php do_action( 'tribe_ext_sch_day_inside_before_loop' ); ?>
+		<?php do_action( 'tribe_ext_sch_day_inside_before_loop' ); ?>
 
     <?php while ( have_posts() ) : the_post(); ?>
 	<?php
@@ -41,11 +41,12 @@ $today               = Tribe__Extension__Schedule_Day_View::today();
             $is_all_day_timeslot        = $current_timeslot === 'All Day';
             $is_active_on_load          = in_array( $current_timeslot, $wp_query->active_timeslots );
             $class_group_active_on_load = $is_active_on_load ? ' tribe-events-day-grouping-is-active' : '';
+		    $class_group_active_events_on_load = $is_active_on_load ? ' tribe-events-day-grouping-event-is-active' : '';
             $aria_expanded_on_load      = $is_active_on_load ? 'true' : 'false';
             $aria_hidden_on_load        = $is_active_on_load ? 'false' : 'true';
         ?>
 
-        </div><!-- .tribe-events-day-time-slot -->
+	</div><!-- .tribe-events-day-time-slot -->
 
         <div
             class="tribe-events-day-time-slot<?php echo $class_group_active_on_load; ?>"
@@ -63,10 +64,9 @@ $today               = Tribe__Extension__Schedule_Day_View::today();
                 </button>
             </h5>
             <?php endif;
-            $is_active_on_load_post = $post->is_active_on_load;?>
-            <div
+            $is_active_on_load_post = $post->is_active_on_load;?><div
                 id="post-<?php the_ID(); ?>"
-                class="<?php tribe_events_event_classes( 'tribe-events-day-group-event' ); ?>"
+                class="<?php tribe_events_event_classes( 'tribe-events-day-group-event' . $class_group_active_events_on_load); ?>"
                 aria-hidden="<?php echo $aria_hidden_on_load; ?>"
                 aria-labelledby="post-trigger-<?php the_ID(); ?>"
                 data-tribe-group-event-start="<?php
@@ -93,7 +93,7 @@ $today               = Tribe__Extension__Schedule_Day_View::today();
 
 		<?php do_action( 'tribe_ext_sch_day_inside_after_loop' ); ?>
 
-	<?php endwhile; ?>
+		<?php endwhile; ?>
 
 	</div><!-- .tribe-events-day-time-slot -->
 
