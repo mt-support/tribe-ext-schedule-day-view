@@ -39,7 +39,7 @@ $today            = Tribe__Extension__Schedule_Day_View::today();
         if ( $current_timeslot !== $post->timeslot ) :
             $current_timeslot           = $post->timeslot;
             $is_all_day_timeslot        = $current_timeslot === 'All Day';
-            $is_active_on_load          = ( $today && ( time() >= 'group start time' && time() < 'group end time' ) ) || ! $today || $is_all_day_timeslot;
+            $is_active_on_load          = Tribe__Extension__Schedule_Day_View::active( [ 'all_day' => $is_all_day_timeslot, 'timeslots' => $post->timeslots ]);
             $class_group_active_on_load = $is_active_on_load ? ' tribe-events-day-grouping-is-active' : '';
             $aria_expanded_on_load      = $is_active_on_load ? 'true' : 'false';
             $aria_hidden_on_load        = $is_active_on_load ? 'false' : 'true';

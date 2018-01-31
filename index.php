@@ -206,4 +206,20 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return get_query_var( 'eventDate' ) == date( 'Y-m-d', time() );
 	}
 
+	public static function active( $args ) {
+		if ( ! self::today() ) {
+			return true;
+		}
+
+		if ( $args['all_day'] ) {
+			return true;
+		}
+
+		if ( time() >= $args['timeslots']['start'] && time()< $args['timeslots']['end']) {
+			return true;
+		}
+
+		return false;
+	}
+
 }
