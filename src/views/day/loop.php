@@ -35,7 +35,6 @@ $current_timeslot = null;
 		<h5><?php echo $current_timeslot; ?></h5>
 		<?php endif;
 
-		<!-- Event  -->
 		$event_type = tribe( 'tec.featured_events' )->is_featured( $post->ID ) ? 'featured' : 'event';
 
 		/**
@@ -45,6 +44,7 @@ $current_timeslot = null;
 		*/
 		$event_type = apply_filters( 'tribe_ext_sch_day_view_event_type', $event_type );
 		?>
+		<!-- Event  -->
 		<div id="post-<?php the_ID(); ?>" class="<?php tribe_events_event_classes(); ?> event-type-<?php $event_type; ?>">
 			<?php tribe_get_template_part( 'day/single' ); ?>
 		</div>

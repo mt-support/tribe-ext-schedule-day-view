@@ -66,7 +66,7 @@ class Tribe__Extension__Example extends Tribe__Extension {
 		return $file;
 	}
 
-	public function override_day_single_event_template( $file ) {
+	public function override_day_single_template( $file ) {
 		$file = $this->get_our_template_dir() . 'single.php';
 
 		return $file;
