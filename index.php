@@ -94,7 +94,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	private function get_timeslot( $timeslot ) {
-		
+
+		return $timeslot;
 	}
 
 	/**
