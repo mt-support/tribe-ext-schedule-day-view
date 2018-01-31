@@ -3,7 +3,7 @@
  * Plugin Name:     The Events Calendar Extension: Schedule Day View
  * Description:     Overrides The Events Calendar's Day View with a Schedule Day View, displaying events within All Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now.
  * Version:         1.0.0
- * Extension Class: Tribe__Extension__Example
+ * Extension Class: Tribe__Extension__Schedule_Day_View
  * Author:          Modern Tribe, Inc.
  * Author URI:      http://m.tri.be/1971
  * License:         GPL version 3 or any later version
@@ -28,7 +28,7 @@ if ( ! class_exists( 'Tribe__Extension' ) ) {
 /**
  * Extension main class, class begins loading on init() function.
  */
-class Tribe__Extension__Example extends Tribe__Extension {
+class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
 
 	private function templates() {
@@ -87,6 +87,18 @@ class Tribe__Extension__Example extends Tribe__Extension {
 		add_action( 'tribe_ext_sch_day_inside_before_loop', function( $posts ) {
 			sleep(2);
 		} );
+	}
+
+	/**
+	 * Determine if an event is a featured event.
+	 *
+	 * Usable within the loop and single templates.
+	 *
+	 * @return bool
+	 */
+	public function is_featured_event() {
+		global $post;
+		return (bool) tribe( 'tec.featured_events' )->is_featured( $post->ID );
 	}
 
 }

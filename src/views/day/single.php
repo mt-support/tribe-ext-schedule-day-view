@@ -23,39 +23,44 @@ $has_venue_address = ( ! empty( $venue_details['address'] ) ) ? ' location' : ''
 // The address string via tribe_get_venue_details will often be populated even when there's
 // no address, so let's get the address string on its own for a couple of checks below.
 $venue_address = tribe_get_address();
+
+// Be like the-events-calendar/src/views/day/single-featured.php
+if ( Tribe__Extension__Schedule_Day_View::instance()->is_featured_event() ) {
+	echo tribe_event_featured_image( null, 'large' );
+}
 ?>
 
-<!-- Event Title -->
+	<!-- Event Title -->
 <?php do_action( 'tribe_ext_sch_day_single_before_the_event_title' ) ?>
-<h2 class="tribe-events-list-event-title summary ">
-	<a class="url" href="<?php echo esc_url( tribe_get_event_link() ); ?>" title="<?php the_title_attribute() ?>" rel="bookmark">
-		<?php the_title() ?>
-	</a>
-</h2>
+	<h2 class="tribe-events-list-event-title summary ">
+		<a class="url" href="<?php echo esc_url( tribe_get_event_link() ); ?>" title="<?php the_title_attribute() ?>" rel="bookmark">
+			<?php the_title() ?>
+		</a>
+	</h2>
 <?php do_action( 'tribe_ext_sch_day_single_after_the_event_title' ) ?>
 
-<!-- Event Meta -->
+	<!-- Event Meta -->
 <?php do_action( 'tribe_ext_sch_day_single_before_the_meta' ) ?>
-<div class="tribe-events-event-meta <?php echo esc_attr( $has_venue . $has_venue_address ); ?>">
+	<div class="tribe-events-event-meta <?php echo esc_attr( $has_venue . $has_venue_address ); ?>">
 
-	<!-- Schedule & Recurrence Details -->
-	<div class="tribe-updated published time-details">
-		<?php echo tribe_events_event_schedule_details(); ?>
-	</div>
+		<!-- Schedule & Recurrence Details -->
+		<div class="tribe-updated published time-details">
+			<?php echo tribe_events_event_schedule_details(); ?>
+		</div>
 
-	<?php if ( $venue_details ) : ?>
-		<!-- Venue Display Info -->
-		<div class="tribe-events-venue-details">
-		<?php
-			$address_delimiter = empty( $venue_address ) ? ' ' : ', ';
+		<?php if ( $venue_details ) : ?>
+			<!-- Venue Display Info -->
+			<div class="tribe-events-venue-details">
+				<?php
+				$address_delimiter = empty( $venue_address ) ? ' ' : ', ';
 
-			// These details are already escaped in various ways earlier in the code.
-			echo implode( $address_delimiter, $venue_details );
-		?>
-		</div> <!-- .tribe-events-venue-details -->
-	<?php endif; ?>
+				// These details are already escaped in various ways earlier in the code.
+				echo implode( $address_delimiter, $venue_details );
+				?>
+			</div> <!-- .tribe-events-venue-details -->
+		<?php endif; ?>
 
-</div><!-- .tribe-events-event-meta -->
+	</div><!-- .tribe-events-event-meta -->
 
 <?php if ( tribe_get_cost() ) : ?>
 	<div class="tribe-events-event-cost">
@@ -69,14 +74,19 @@ $venue_address = tribe_get_address();
 
 <?php do_action( 'tribe_ext_sch_day_single_after_the_meta' ) ?>
 
-<!-- Event Image -->
-<?php echo tribe_event_featured_image( null, 'medium' ); ?>
+	<!-- Event Image -->
+<?php
+// Be like the-events-calendar/src/views/day/single-event.php
+if ( ! Tribe__Extension__Schedule_Day_View::instance()->is_featured_event() ) {
+	echo tribe_event_featured_image( null, 'medium' );
+}
+?>
 
-<!-- Event Content -->
+	<!-- Event Content -->
 <?php do_action( 'tribe_ext_sch_day_single_before_the_content' ) ?>
-<div class="tribe-events-list-event-description tribe-events-content description entry-summary">
-	<?php echo tribe_events_get_the_excerpt(); ?>
-	<a href="<?php echo esc_url( tribe_get_event_link() ); ?>" class="tribe-events-read-more" rel="bookmark"><?php esc_html_e( 'Find out more', 'the-events-calendar' ) ?> &raquo;</a>
-</div><!-- .tribe-events-list-event-description -->
+	<div class="tribe-events-list-event-description tribe-events-content description entry-summary">
+		<?php echo tribe_events_get_the_excerpt(); ?>
+		<a href="<?php echo esc_url( tribe_get_event_link() ); ?>" class="tribe-events-read-more" rel="bookmark"><?php esc_html_e( 'Find out more', 'the-events-calendar' ) ?> &raquo;</a>
+	</div><!-- .tribe-events-list-event-description -->
 <?php
 do_action( 'tribe_ext_sch_day_single_after_the_content' );
