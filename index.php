@@ -71,15 +71,20 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 * @return array
 	 */
 	protected function get_time_of_day_ranges() {
-		$time_of_day_ranges = array(
-			'allday' => __( 'All Day', 'tribe-ext-schedule-day-view' ),
-			'06-12'  => __( 'Morning', 'tribe-ext-schedule-day-view' ),
-			'12-17'  => __( 'Afternoon', 'tribe-ext-schedule-day-view' ),
-			'17-21'  => __( 'Evening', 'tribe-ext-schedule-day-view' ),
-			'21-06'  => __( 'Night', 'tribe-ext-schedule-day-view' ),
-		);
-
-		return $time_of_day_ranges;
+		return [
+			__( 'Morning', 'tribe-ext-schedule-day-view' ) => [
+				6, 7, 8, 9, 10, 11,
+			],
+			__( 'Afternoon', 'tribe-ext-schedule-day-view' ) => [
+				12, 13, 14, 15, 16,
+			],
+			__( 'Evening', 'tribe-ext-schedule-day-view' ) => [
+				17, 18, 19, 20,
+			],
+			__( 'Night', 'tribe-ext-schedule-day-view' ) => [
+				21, 22, 23, 0, 1, 2, 3, 4, 5,
+			],
+		];
 	}
 
 	private function setup_loop() {
@@ -87,10 +92,22 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			global $wp_query;
 
 			foreach ( $wp_query->posts as &$post ) {
-				// @TODO: update the ->timeslot
+				$post->timeslot = $this->get_timeslot( $post->timeslot );
 				// @TODO: add data-attributes
 			}
 		} );
+	}
+
+	private function get_timeslot( $timeslot ) {
+		$hour = date( 'G', strtotime( $timeslot) );
+
+		foreach ( $this->get_time_of_day_ranges() as $time_of_day => $hours ) {
+			if ( in_array( $hour, $hours ) ) {
+				return $time_of_day;
+			}
+		}
+
+		return $timeslot;
 	}
 
 	/**
