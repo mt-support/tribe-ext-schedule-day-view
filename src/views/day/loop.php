@@ -47,6 +47,8 @@ $today            = Tribe__Extension__Schedule_Day_View::today();
             $class_group_active_events_on_load = $is_active_on_load ? ' tribe-events-day-grouping-event-is-active' : '';
             $aria_expanded_on_load             = $is_active_on_load ? 'true' : 'false';
             $aria_hidden_on_load               = $is_active_on_load ? 'false' : 'true';
+
+            // if not today, for single events, don't do the active class
         ?>
 
         </div><!-- .tribe-events-day-time-slot -->

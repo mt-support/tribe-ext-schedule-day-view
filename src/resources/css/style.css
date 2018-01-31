@@ -40,6 +40,10 @@
 	border-left: 3px solid transparent;
 }
 
+.tribe-events-day .tribe-events-list .tribe-events-loop .tribe-event-featured {
+	margin-bottom: 0;
+}
+
 .tribe-events-day .tribe-events-day-time-slot .type-tribe_events.tribe-events-day-grouping-event-is-active {
 	border-left-color: red;
 }
@@ -54,6 +58,10 @@
 	font-size: 13px;
 	color: #666;
 	margin-bottom: 8px;
+}
+
+.tribe-events-day .tribe-events-list .tribe-event-featured .time-details {
+	color: #fff;
 }
 
 .tribe-events-day [class*="tribe-events-category-"] h2 a {
@@ -84,6 +92,12 @@
 	border-top: 1px solid rgba(0, 0, 0, 0.25);
 	padding-top: 8px;
 	font-weight: 600;
+
+	display: none;
+}
+
+.tribe-events-day .tribe-events-list .tribe-event-featured .tribe-events-read-more {
+	border-top-color: rgba(0, 0, 0, 0.25);
 }
 
 
