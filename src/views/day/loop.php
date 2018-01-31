@@ -50,7 +50,24 @@ $today            = Tribe__Extension__Schedule_Day_View::today();
             </button>
         </h5>
 		<?php endif; ?>
-		<div id="post-<?php the_ID(); ?>" class="<?php tribe_events_event_classes( 'tribe-events-day-group-event' ); ?>">
+		<div id="post-<?php the_ID(); ?>" class="<?php tribe_events_event_classes(); ?>"
+			 data-start="<?php
+			 // We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
+			 $start = sprintf( '%s %s',
+				 get_post_meta( $post->ID, "_EventStartDate", true ),
+				 Tribe__Events__Timezones::get_event_timezone_string( $post->ID )
+			 );
+			 echo esc_attr( strtotime( $start ) );
+			 ?>"
+			 data-end="<?php
+			 // We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
+			 $end = sprintf( '%s %s',
+				 get_post_meta( $post->ID, "_EventEndDate", true ),
+				 Tribe__Events__Timezones::get_event_timezone_string( $post->ID )
+			 );
+			 echo esc_attr( strtotime( $end ) );
+			 ?>"
+		>
 			<?php tribe_get_template_part( 'day/single' ); ?>
 		</div>
 
