@@ -31,7 +31,7 @@ if ( ! class_exists( 'Tribe__Extension' ) ) {
  */
 class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
-	const PREFIX = 'tribe_ext_sch_day_view_';
+	const PREFIX = 'tribe_ext_sch_day_view';
 
 	private function templates() {
 		return
@@ -74,10 +74,10 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 * Load this view's assets.
 	 */
 	public function register_assets() {
-		$dir = trailingslashit( plugin_dir_path( __FILE__ ) ) . 'src/resources/';
+		$resources_url = trailingslashit( plugin_dir_url( __FILE__ ) ) . 'src/resources/';
 
-		wp_register_style( self::PREFIX, $dir . 'css/style.css', array( 'tribe-events-calendar-style' ), $this->get_version() );
-		wp_register_script( self::PREFIX . 'js', $dir . 'js/script.js', array( 'tribe-moment' ), $this->get_version(), true );
+		wp_register_style( self::PREFIX, $resources_url . 'css/style.css', array( 'tribe-events-calendar-style' ), $this->get_version() );
+		wp_register_script( self::PREFIX . '_js', $resources_url . 'js/script.js', array( 'tribe-moment' ), $this->get_version(), true );
 	}
 
 	/**
@@ -85,8 +85,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 */
 	public function load_assets() {
 		if ( tribe_is_day() ) {
-			wp_enqueue_style( self::PREFIX . 'css' );
-			wp_enqueue_script( self::PREFIX . 'js' );
+			wp_enqueue_style( self::PREFIX );
+			wp_enqueue_script( self::PREFIX . '_js' );
 		}
 	}
 
