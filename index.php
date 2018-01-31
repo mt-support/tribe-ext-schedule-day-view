@@ -29,6 +29,7 @@ if ( ! class_exists( 'Tribe__Extension' ) ) {
  */
 class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
+	const HANDLE = 'tribe_ext_sch_day_view_';
 
 	private function templates() {
 		return
@@ -40,7 +41,6 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			];
 	}
 
-
 	public function construct() {
 		$this->add_required_plugin( 'Tribe__Events__Main' );
 		$this->set_url( 'https://theeventscalendar.com/extensions/schedule-day-view/' );
@@ -49,6 +49,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	public function init() {
 		$this->setup_templates();
 		$this->setup_loop();
+		add_action( 'init', array( $this, 'register_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets' ) );
 	}
 
 	/**
@@ -56,10 +58,32 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 */
 	private function setup_templates() {
 		foreach ( $this->templates() as $template => $new_template ) {
-			add_filter( 'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
+			add_filter(
+				'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
 				// Return the path for our file.
 				return plugin_dir_path( __FILE__ ) . $new_template;
-			}, 10, 3 );
+			}, 10, 3
+			);
+		}
+	}
+
+	/**
+	 * Load this view's assets.
+	 */
+	private function register_assets() {
+		$dir = trailingslashit( plugin_dir_path( __FILE__ ) ) . 'src/resources/';
+
+		wp_register_script( self::HANDLE . 'css', $dir . 'css/style.css', array( 'events-css' ), $this->get_version() );
+		wp_register_script( self::HANDLE . 'js', $dir . 'js/script.js', array( 'calendar-script' ), $this->get_version(), true );
+	}
+
+	/**
+	 * Load this view's assets.
+	 */
+	private function load_assets() {
+		if ( tribe_is_day() ) {
+			wp_enqueue_style(HANDLE . 'css');
+			wp_enqueue_script(HANDLE . 'js');
 		}
 	}
 
@@ -88,14 +112,16 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	private function setup_loop() {
-		add_action( 'tribe_ext_sch_day_inside_before_loop', function () {
+		add_action(
+			'tribe_ext_sch_day_inside_before_loop', function () {
 			global $wp_query;
 
 			foreach ( $wp_query->posts as &$post ) {
 				$post->timeslot  = $this->get_timeslot( $post->timeslot );
 				$post->timeslots = $this->get_js_timeslots();
 			}
-		} );
+		}
+		);
 	}
 
 	private function get_timeslot( $timeslot ) {
