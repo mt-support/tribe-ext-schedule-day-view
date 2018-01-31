@@ -73,8 +73,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	public function register_assets() {
 		$dir = trailingslashit( plugin_dir_path( __FILE__ ) ) . 'src/resources/';
 
-		wp_register_style( self::PREFIX . 'css', $dir . 'css/style.css', array( 'tribe-common', 'tribe-moment' ), $this->get_version() );
-		wp_register_script( self::PREFIX . 'js', $dir . 'js/script.js', array( 'calendar-script' ), $this->get_version(), true );
+		wp_register_style( self::PREFIX . 'css', $dir . 'css/style.css', array( 'tribe-common' ), $this->get_version() );
+		wp_register_script( self::PREFIX . 'js', $dir . 'js/script.js', array( 'calendar-script', 'tribe-moment' ), $this->get_version(), true );
 	}
 
 	/**
