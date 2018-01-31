@@ -157,8 +157,17 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 				} else {
 					$post->timeslot = $this->get_timeslot( $post->timeslot );
 				}
-				$post->timeslots = $this->get_js_timeslots( $post->timeslot );
+				$post->timeslots = $this->get_js_timeslots( $post->timeslot, $post->ID );
+				$post->is_active_on_load = $this->active( [ 'all_day' => ( 'All Day' == $post->timeslot ), 'timeslots' => $post->timeslots, 'group_name' => $post->timeslot ] );
+				if ( $post->is_active_on_load ) {
+					$active_timeslots[] = $post->timeslot;
+				}
 			}
+
+			$wp_query->active_timeslots = array_unique( $active_timeslots );
+
+			$wp_query->rewind_posts();
+
 		}
 		);
 	}
@@ -175,16 +184,24 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return $timeslot;
 	}
 
-	private function get_js_timeslots( $timeslot ) {
+	private function get_js_timeslots( $timeslot, $id ) {
 
 		if ( array_key_exists( $timeslot, $this->get_time_of_day_ranges() ) ) {
-			$date  = date( 'Y-m-d', time() );
-			$start = strtotime( $date . 'T' . reset( $this->get_time_of_day_ranges()[$timeslot] ) . ':00:00' );
-			$end   = strtotime( $date . 'T' . end( $this->get_time_of_day_ranges()[$timeslot] ) . ':00:00' );
+			$start = sprintf(
+				'%s %s',
+				get_post_meta( $id, "_EventStartDate", true ),
+				get_post_meta( $id, "_EventTimezone", true )
+			);
+			$end = sprintf(
+				'%s %s',
+				get_post_meta( $id, "_EventEndDate", true ),
+				get_post_meta( $id, "_EventTimezone", true )
+			);
 
+			sleep(0);
 			return [
-				'start' => $start,
-				'end'   => $end,
+				'start' => strtotime( $start ),
+				'end'   => strtotime( $end ),
 			];
 		}
 	}
@@ -222,7 +239,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return get_query_var( 'eventDate' ) == date( 'Y-m-d', time() );
 	}
 
-	public static function active( $args ) {
+	public function active( $args ) {
 		if ( ! self::today() ) {
 			return true;
 		}
