@@ -51,6 +51,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	public function init() {
 		$this->setup_templates();
 		$this->setup_loop();
+		$this->display_cleanup();
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets' ) );
 	}
@@ -160,6 +161,12 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		global $post;
 
 		return (bool) tribe( 'tec.featured_events' )->is_featured( $post->ID );
+	}
+
+	private function display_cleanup() {
+		add_filter( 'tribe_events_recurrence_tooltip', function( $tooltip ) {
+			return '';
+		}, 10, 1 );
 	}
 
 }
