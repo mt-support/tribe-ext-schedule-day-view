@@ -29,6 +29,10 @@
 	padding: 0;
 }
 
+.tribe-events-day .tribe-events-day-time-slot h5 + .type-tribe_events {
+	margin-top: 1px;
+}
+
 .tribe-events-day .tribe-events-day-time-slot .type-tribe_events {
 	margin-left: auto;
 	margin-right: auto;
