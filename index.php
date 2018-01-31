@@ -167,6 +167,11 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		add_filter( 'tribe_events_recurrence_tooltip', function( $tooltip ) {
 			return '';
 		}, 10, 1 );
+
+		add_filter( 'tribe_get_venue_details', function( $venue_details ) {
+			unset( $venue_details['address'] );
+			return $venue_details;
+		} );
 	}
 
 }
