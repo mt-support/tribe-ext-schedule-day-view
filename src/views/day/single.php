@@ -74,7 +74,6 @@ if ( Tribe__Extension__Schedule_Day_View::instance()->is_featured_event() ) {
 
 <?php do_action( 'tribe_ext_sch_day_single_after_the_meta' ) ?>
 
-	<!-- Event Image -->
 <?php
 // Be like the-events-calendar/src/views/day/single-event.php
 if ( ! Tribe__Extension__Schedule_Day_View::instance()->is_featured_event() ) {
