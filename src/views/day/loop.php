@@ -15,18 +15,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $more, $post, $wp_query;
-$more = false;
+$more             = false;
 $current_timeslot = null;
-
-$today = Tribe__Extension__Schedule_Day_View::today();
 
 ?>
 
-<div id="tribe-events-day" class="tribe-events-loop">
+<div id="tribe-events-day" class="tribe-events-loop" data-site-timezone="<?php echo esc_attr( Tribe__Events__Timezones::wp_timezone_string() ); ?>" data-now="<?php echo esc_attr( time() ); ?>">
 	<div class="tribe-events-day-time-slot">
 
-	<?php do_action( 'tribe_ext_sch_day_inside_before_loop' ); ?>
-	<?php while ( have_posts() ) : the_post(); ?>
+		<?php do_action( 'tribe_ext_sch_day_inside_before_loop' ); ?>
+		<?php while ( have_posts() ) :
+		the_post(); ?>
 
 		<?php if ( $current_timeslot != $post->timeslot ) :
 		$current_timeslot = $post->timeslot; ?>
@@ -41,7 +40,7 @@ $today = Tribe__Extension__Schedule_Day_View::today();
 		</div>
 
 		<?php do_action( 'tribe_ext_sch_day_inside_after_loop' ); ?>
-	<?php endwhile; ?>
+		<?php endwhile; ?>
 
 	</div>
 	<!-- .tribe-events-day-time-slot -->
