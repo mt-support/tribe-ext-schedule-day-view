@@ -47,8 +47,13 @@ class Tribe__Extension__Example extends Tribe__Extension {
 	}
 
 	public function init() {
-		// @TODO: Cliff...we can handle all the filtering in 3 lines...
-		// Slack won't open :single-tear:
+		$this->setup_templates();
+	}
+
+	/**
+	 * Filters templates to use our overrides.
+	 */
+	private function setup_templates(){
 		foreach ( $this->templates() as $template => $new_template ) {
 			add_filter( 'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
 				// Return the path for our file.
