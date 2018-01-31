@@ -198,12 +198,12 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		if ( array_key_exists( $timeslot, $this->get_time_of_day_ranges() ) ) {
 			$start = sprintf(
 				'%s %s',
-				get_post_meta( $id, "_EventStartDate", true ),
+				get_post_meta( $id, "_EventStartDateUTC", true ),
 				get_post_meta( $id, "_EventTimezone", true )
 			);
 			$end = sprintf(
 				'%s %s',
-				get_post_meta( $id, "_EventEndDate", true ),
+				get_post_meta( $id, "_EventEndDateUTC", true ),
 				get_post_meta( $id, "_EventTimezone", true )
 			);
 
