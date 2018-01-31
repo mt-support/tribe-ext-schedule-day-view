@@ -47,4 +47,33 @@ class Tribe__Extension__Example extends Tribe__Extension {
 		}
 
 	}
+
+	/**
+	 * Get the times of day as an array.
+	 *
+	 * @see \Tribe__Events__Filterbar__Filters__Time_Of_Day::get_values()
+	 *
+	 * @return array
+	 */
+	protected function get_times_of_day() {
+		$time_of_day_array = array(
+			'allday' => __( 'All Day', 'tribe-ext-schedule-day-view' ),
+			'06-12'  => __( 'Morning', 'tribe-ext-schedule-day-view' ),
+			'12-17'  => __( 'Afternoon', 'tribe-ext-schedule-day-view' ),
+			'17-21'  => __( 'Evening', 'tribe-ext-schedule-day-view' ),
+			'21-06'  => __( 'Night', 'tribe-ext-schedule-day-view' ),
+		);
+
+		$time_of_day_values = array();
+
+		foreach ( $time_of_day_array as $value => $name ) {
+			$time_of_day_values[] = array(
+				'name'  => $name,
+				'value' => $value,
+			);
+		}
+
+		return $time_of_day_values;
+	}
+
 }
