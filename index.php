@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name:     [Base Plugin Name] Extension: [Extension Name]
- * Description:     [Extension Description]
+ * Plugin Name:     The Events Calendar Extension: Schedule Day View
+ * Description:     Overrides The Events Calendar's Day View with a Schedule Day View, displaying events within All Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now.
  * Version:         1.0.0
  * Extension Class: Tribe__Extension__Example
  * Author:          Modern Tribe, Inc.
@@ -36,7 +36,8 @@ class Tribe__Extension__Example extends Tribe__Extension {
 	];
 
 	public function construct() {
-		parent::construct();
+		$this->add_required_plugin( 'Tribe__Events__Main' );
+		$this->set_url( 'https://theeventscalendar.com/extensions/schedule-day-view/' );
 	}
 
 	public function init() {

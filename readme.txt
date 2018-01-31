@@ -1,4 +1,4 @@
-=== [Extension Name] ===
+=== The Events Calendar Extension: Schedule Day View ===
 Contributors: ModernTribe
 Donate link: http://m.tri.be/29
 Tags: events, calendar
@@ -8,14 +8,13 @@ Stable tag: 1.0.0
 License: GPL version 3 or any later version
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Brief description of the extension.
+Overrides The Events Calendar's Day View with a Schedule Day View, displaying events within All Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now.
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+Activating this extension will replace The Events Calendar's Day View with a Schedule Day View. This is accomplished by doing a template override through a plugin instead of within your active theme.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+Schedule Day View displays a single day's events with the added context of All Day, Morning, Afternoon, and Evening; it also highlights events happening _right now._
 
 == Installation ==
 
