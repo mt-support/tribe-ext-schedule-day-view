@@ -88,6 +88,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			foreach ( $wp_query->posts as &$post ) {
 				// @TODO: update the ->timeslot
 				// @TODO: add data-attributes
+				$post->featured = $this->is_featured_event();
 			}
 		} );
 	}
