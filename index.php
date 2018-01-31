@@ -44,6 +44,14 @@ class Tribe__Extension__Example extends Tribe__Extension {
 	}
 
 	public function init() {
+		foreach ( self::SINGLE_TYPES as $template => $new_template ) {
+			add_filter( 'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
+				// Return the path for our file.
+				return plugin_dir_path( __FILE__ ) . $new_template;
+			}, 10, 3 );
+		}
+
+
 		add_filter( 'tribe_events_template_day/loop.php', array( $this, 'override_day_loop_template' ) );
 		add_filter( 'tribe_events_template_day/single.php', array( $this, 'override_day_single_template' ) );
 
