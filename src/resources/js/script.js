@@ -25,14 +25,14 @@
 	$( document ).ready( function() {
 
 		var $container = $( '#tribe-events-day' ),
-			tribe_timezone = $container.data( 'timezone' ),
-			tribe_time_on_load = $container.data( 'current_time_on_load' );
+			tribe_timezone = $container.data( 'tribe-timezone' ),
+			tribe_time_on_load = $container.data( 'tribe-now' );
 
-		// for ajax pagination?
-		// finish on load
-		// styles / refinement
+		// finish on load: open or not, active events or not
+		// styles / refinement: skeleton, full, theme
 		// stretch goals
 		// bring JS closer in line
+		// for ajax pagination?
 
 		/**
 		 * @function
@@ -40,8 +40,21 @@
 		 */
 
 		$( '#tribe-events' ).on( 'click', '.tribe-events-day-group-trigger',function( e ) {
+			var $target = $(e.target),
+				$parent = $target.closest('.tribe-events-day-time-slot'),
+				$content = $parent.find('.post-tribe-events-day-group-event');
+
 			e.preventDefault();
-			$(e.target).closest('.tribe-events-day-time-slot').toggleClass('tribe-events-day-grouping-is-active');
+
+			if ( $parent.is('.tribe-events-day-grouping-is-active') ) {
+				$parent.removeClass('tribe-events-day-grouping-is-active');
+				$target.attr('aria-expanded', false);
+				$content.attr('aria-hidden', true);
+			} else {
+				$parent.addClass('tribe-events-day-grouping-is-active');
+				$target.attr('aria-expanded', true);
+				$content.attr('aria-hidden', false);
+			}
 		});
 
 
