@@ -49,6 +49,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	public function init() {
 		$this->setup_templates();
 		$this->setup_loop();
+		$this->setup_plain_language_redirect();
 	}
 
 	/**
@@ -128,6 +129,15 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		global $post;
 
 		return (bool) tribe( 'tec.featured_events' )->is_featured( $post->ID );
+	}
+
+	private function setup_plain_language_redirect() {
+//		add_filter( 'rewrite_rules_array', function ( $rules ) {
+//			return array_merge(
+//				[ 'events/tomorrow' => 'index.php?post_type=tribe_events&eventDate'
+//				$rules
+//			);
+//		}, 10, 1 );
 	}
 
 }
