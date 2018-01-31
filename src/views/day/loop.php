@@ -42,7 +42,7 @@ $today            = Tribe__Extension__Schedule_Day_View::today();
 		?>
 	</div><!-- .tribe-events-day-time-slot -->
 
-	<div class="tribe-events-day-time-slot<?php echo $class_group_active_on_load; ?>">
+	<div class="tribe-events-day-time-slot<?php echo $class_group_active_on_load; ?>" data-groupstart="<?php echo $post->timeslots['start']; ?>" data-groupend="<?php echo $post->timeslots['end']; ?>">
         <h5>
             <button class="tribe-events-day-group-trigger">
             <?php echo $current_timeslot; ?>
