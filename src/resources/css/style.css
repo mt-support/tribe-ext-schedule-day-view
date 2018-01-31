@@ -59,7 +59,7 @@
 	margin-bottom: 0;
 }
 
-.tribe-events-day .tribe-events-day-time-slot .type-tribe_events.tribe-events-day-grouping-event-is-active {
+.tribe-events-day .tribe-events-loop-day-today .tribe-events-day-time-slot .type-tribe_events.tribe-events-day-grouping-event-is-active {
 	border-left-color: red;
 }
 

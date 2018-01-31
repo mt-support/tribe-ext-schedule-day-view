@@ -20,12 +20,13 @@ $more                = false;
 $current_timeslot    = null;
 $is_all_day_timeslot = null;
 $today               = Tribe__Extension__Schedule_Day_View::today();
+$class_is_today      = $today ? ' tribe-events-loop-day-today' : '';
 
 ?>
 
 <div
 	id="tribe-events-day"
-	class="tribe-events-loop"
+	class="tribe-events-loop<?php echo $class_is_today; ?>"
 	data-tribe-timezone="<?php echo esc_attr( Tribe__Events__Timezones::wp_timezone_string() ); ?>"
 	data-tribe-now="<?php echo esc_attr( time() ); ?>"
 >
