@@ -26,7 +26,7 @@ if ( ! class_exists( 'Tribe__Extension' ) ) {
 /**
  * Extension main class, class begins loading on init() function.
  */
-class Tribe__Extension__Example extends Tribe__Extension {
+class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
 
 	private function templates() {
@@ -90,6 +90,18 @@ class Tribe__Extension__Example extends Tribe__Extension {
 				// @TODO: add data-attributes
 			}
 		} );
+	}
+
+	/**
+	 * Determine if an event is a featured event.
+	 *
+	 * Usable within the loop and single templates.
+	 *
+	 * @return bool
+	 */
+	public function is_featured_event() {
+		global $post;
+		return (bool) tribe( 'tec.featured_events' )->is_featured( $post->ID );
 	}
 
 }
