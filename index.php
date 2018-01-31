@@ -92,7 +92,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			global $wp_query;
 
 			foreach ( $wp_query->posts as &$post ) {
-				$post->timeslot = $this->get_timeslot( $post->timeslot );
+				$post->timeslot  = $this->get_timeslot( $post->timeslot );
 				$post->timeslots = $this->get_js_timeslots();
 			}
 		} );
