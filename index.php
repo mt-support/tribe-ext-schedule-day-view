@@ -100,16 +100,36 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	protected function get_time_of_day_ranges() {
 		return [
 			__( 'Morning', 'tribe-ext-schedule-day-view' )   => [
-				6, 7, 8, 9, 10, 11,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
 			],
 			__( 'Afternoon', 'tribe-ext-schedule-day-view' ) => [
-				12, 13, 14, 15, 16,
+				12,
+				13,
+				14,
+				15,
+				16,
 			],
 			__( 'Evening', 'tribe-ext-schedule-day-view' )   => [
-				17, 18, 19, 20,
+				17,
+				18,
+				19,
+				20,
 			],
 			__( 'Night', 'tribe-ext-schedule-day-view' )     => [
-				21, 22, 23, 0, 1, 2, 3, 4, 5,
+				21,
+				22,
+				23,
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
 			],
 		];
 	}
@@ -121,11 +141,11 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
 			foreach ( $wp_query->posts as &$post ) {
 				if ( tribe_event_is_all_day( $post->ID ) ) {
-					$post->timeslot  = __( 'All Day', 'tribe-ext-schedule-day-view' );
+					$post->timeslot = __( 'All Day', 'tribe-ext-schedule-day-view' );
 				} else {
-					$post->timeslot  = $this->get_timeslot( $post->timeslot );
+					$post->timeslot = $this->get_timeslot( $post->timeslot );
 				}
-				$post->timeslots = $this->get_js_timeslots();
+				$post->timeslots = $this->get_js_timeslots( $post->timeslot );
 			}
 		}
 		);
@@ -143,11 +163,18 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return $timeslot;
 	}
 
-	private function get_js_timeslots() {
-		return [
-			'start' => tribe_get_start_date( get_the_ID(), true, 'U' ),
-			'end'   => tribe_get_end_date( get_the_ID(), true, 'U' ),
-		];
+	private function get_js_timeslots( $timeslot ) {
+
+		if ( array_key_exists( $timeslot, $this->get_time_of_day_ranges() ) ) {
+			$date  = date( 'Y-m-d', time() );
+			$start = strtotime( $date . 'T' . reset( $this->get_time_of_day_ranges()[ $timeslot ] ) . ':00:00' );
+			$end   = strtotime( $date . 'T' . end( $this->get_time_of_day_ranges()[ $timeslot ] ) . ':00:00' );
+
+			return [
+				'start' => $start,
+				'end'   => $end,
+			];
+		}
 	}
 
 	/**
@@ -164,19 +191,18 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	private function display_cleanup() {
-		add_filter( 'tribe_events_recurrence_tooltip', function( $tooltip ) {
+		add_filter( 'tribe_events_recurrence_tooltip', function ( $tooltip ) {
 			return '';
 		}, 10, 1 );
 
-		add_filter( 'tribe_get_venue_details', function( $venue_details ) {
+		add_filter( 'tribe_get_venue_details', function ( $venue_details ) {
 			unset( $venue_details['address'] );
+
 			return $venue_details;
 		} );
 	}
 
 	public static function today() {
-		global $wp_query;
-
 		return get_query_var( 'eventDate' ) == date( 'Y-m-d', time() );
 	}
 
