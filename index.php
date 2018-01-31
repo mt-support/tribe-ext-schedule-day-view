@@ -160,13 +160,13 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		$plane_language = [
 			__( 'events/tomorrow', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventDateModified=1',
 			__( 'events/yesterday', 'tribe-ext-schedule-day-view' )               => 'index.php?post_type=tribe_events&eventDateModified=-1',
+			__( 'events/nextweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=1&eventDisplay=week',
+			__( 'events/lastweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=-1&eventDisplay=week',
+			__( 'events/nextmonth', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventMonthModified=1&eventDisplay=month',
+			__( 'events/lastmonth', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventMonthModified=-1&eventDisplay=month',
 			__( 'events/today', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventDateModified=$matches[1]',
-			__( 'events/nextweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=1',
-			__( 'events/lastweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=-1',
-			__( 'events/week', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?'  => 'index.php?post_type=tribe_events&eventEventModified=$matches[1]',
-			__( 'events/nextmonth', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventMonthModified=1',
-			__( 'events/lastmonth', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventMonthModified=-1',
-			__( 'events/month', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?'  => 'index.php?post_type=tribe_events&eventMonthModified=$matches[1]',
+			__( 'events/week', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?'  => 'index.php?post_type=tribe_events&eventWeekModified=$matches[1]&eventDisplay=week',
+			__( 'events/month', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?'  => 'index.php?post_type=tribe_events&eventMonthModified=$matches[1]&eventDisplay=month',
 		];
 
 		add_filter( 'rewrite_rules_array', function ( $rules ) use ( $plane_language ) {
@@ -190,7 +190,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			}
 
 			if ( get_query_var( 'eventMonthModified' ) ) {
-				$offset = date( 'Y-m-d', time() + ( MONTH_IN_SECONDS * get_query_var( 'eventWeekModified' ) ) );
+				$offset = date( 'Y-m-d', time() + ( MONTH_IN_SECONDS * get_query_var( 'eventMonthModified' ) ) );
 				$query->set( 'eventDate', $offset );
 			}
 
