@@ -53,7 +53,11 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		$this->setup_loop();
 		$this->display_cleanup();
 		add_action( 'init', array( $this, 'register_assets' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets' ) );
+
+		// Load assets for main archive Day View
+		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
+		// Load assets for PRO shortcode
+		add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'load_assets_in_day_view_shortcode' ) );
 	}
 
 	/**
@@ -81,13 +85,21 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * Load this view's assets.
+	 * Load this view's assets in Day archive view.
 	 */
-	public function load_assets() {
+	public function load_assets_in_day_view_archive() {
 		if ( tribe_is_day() ) {
 			wp_enqueue_style( self::PREFIX );
 			wp_enqueue_script( self::PREFIX . '_js' );
 		}
+	}
+
+	/**
+	 * Load this view's assets in Day shortcode view.
+	 */
+	public function load_assets_in_day_view_shortcode() {
+		wp_enqueue_style( self::PREFIX );
+		wp_enqueue_script( self::PREFIX . '_js' );
 	}
 
 	/**
@@ -167,8 +179,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
 		if ( array_key_exists( $timeslot, $this->get_time_of_day_ranges() ) ) {
 			$date  = date( 'Y-m-d', time() );
-			$start = strtotime( $date . 'T' . reset( $this->get_time_of_day_ranges()[ $timeslot ] ) . ':00:00' );
-			$end   = strtotime( $date . 'T' . end( $this->get_time_of_day_ranges()[ $timeslot ] ) . ':00:00' );
+			$start = strtotime( $date . 'T' . reset( $this->get_time_of_day_ranges()[$timeslot] ) . ':00:00' );
+			$end   = strtotime( $date . 'T' . end( $this->get_time_of_day_ranges()[$timeslot] ) . ':00:00' );
 
 			return [
 				'start' => $start,
@@ -191,15 +203,19 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	private function display_cleanup() {
-		add_filter( 'tribe_events_recurrence_tooltip', function ( $tooltip ) {
+		add_filter(
+			'tribe_events_recurrence_tooltip', function ( $tooltip ) {
 			return '';
-		}, 10, 1 );
+		}, 10, 1
+		);
 
-		add_filter( 'tribe_get_venue_details', function ( $venue_details ) {
+		add_filter(
+			'tribe_get_venue_details', function ( $venue_details ) {
 			unset( $venue_details['address'] );
 
 			return $venue_details;
-		} );
+		}
+		);
 	}
 
 	public static function today() {
