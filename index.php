@@ -34,9 +34,9 @@ class Tribe__Extension__Example extends Tribe__Extension {
 	private function templates() {
 		return
 			[
-				'day/single-event.php'    => 'views/day/single.php',
-				'day/single-featured.php' => 'views/day/single.php',
-				'day/loop.php'            => 'views/day/loop.php',
+				'day/single-event.php'    => 'src/views/day/single.php',
+				'day/single-featured.php' => 'src/views/day/single.php',
+				'day/loop.php'            => 'src/views/day/loop.php',
 			];
 	}
 
@@ -48,6 +48,7 @@ class Tribe__Extension__Example extends Tribe__Extension {
 
 	public function init() {
 		$this->setup_templates();
+		$this->setup_loop();
 	}
 
 	/**
@@ -79,6 +80,13 @@ class Tribe__Extension__Example extends Tribe__Extension {
 		);
 
 		return $time_of_day_ranges;
+	}
+
+	private function setup_loop() {
+		global $posts;
+		add_action( 'tribe_ext_sch_day_inside_before_loop', function( $posts ) {
+			sleep(2);
+		} );
 	}
 
 }

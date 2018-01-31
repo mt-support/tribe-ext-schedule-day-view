@@ -23,8 +23,8 @@ $current_timeslot = null;
 <div id="tribe-events-day" class="tribe-events-loop">
 	<div class="tribe-events-day-time-slot">
 
+	<?php do_action( 'tribe_ext_sch_day_inside_before_loop' ); ?>
 	<?php while ( have_posts() ) : the_post(); ?>
-		<?php do_action( 'tribe_ext_sch_day_inside_before_loop' ); ?>
 
 		<?php if ( $current_timeslot != $post->timeslot ) :
 		$current_timeslot = $post->timeslot; ?>
