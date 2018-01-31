@@ -27,55 +27,55 @@ $venue_address = tribe_get_address();
 
 <!-- Schedule & Recurrence Details -->
 <div class="tribe-updated published time-details">
-    <?php echo tribe_events_event_schedule_details(); ?>
+	<?php echo tribe_events_event_schedule_details(); ?>
 </div>
 
 <div class="tribe-events-day-event-content">
 
-    <!-- Event Title -->
-    <?php do_action( 'tribe_ext_sch_day_single_before_the_event_title' ) ?>
-        <h2 class="tribe-events-list-event-title summary ">
-            <a class="url" href="<?php echo esc_url( tribe_get_event_link() ); ?>" title="<?php the_title_attribute() ?>" rel="bookmark">
-                <?php the_title() ?>
-            </a>
-        </h2>
-    <?php do_action( 'tribe_ext_sch_day_single_after_the_event_title' ) ?>
+	<!-- Event Title -->
+	<?php do_action( 'tribe_ext_sch_day_single_before_the_event_title' ) ?>
+		<h2 class="tribe-events-list-event-title summary ">
+			<a class="url" href="<?php echo esc_url( tribe_get_event_link() ); ?>" title="<?php the_title_attribute() ?>" rel="bookmark">
+				<?php the_title() ?>
+			</a>
+		</h2>
+	<?php do_action( 'tribe_ext_sch_day_single_after_the_event_title' ) ?>
 
-    <!-- Event Meta -->
-    <?php do_action( 'tribe_ext_sch_day_single_before_the_meta' ) ?>
-    <div class="tribe-events-event-meta <?php echo esc_attr( $has_venue ); ?>">
+	<!-- Event Meta -->
+	<?php do_action( 'tribe_ext_sch_day_single_before_the_meta' ) ?>
+	<div class="tribe-events-event-meta <?php echo esc_attr( $has_venue ); ?>">
 
-        <?php if ( $venue_details ) : ?>
-            <!-- Venue Display Info -->
-            <div class="tribe-events-venue-details">
-                <?php
-                $address_delimiter = empty( $venue_address ) ? ' ' : ', ';
+		<?php if ( $venue_details ) : ?>
+			<!-- Venue Display Info -->
+			<div class="tribe-events-venue-details">
+				<?php
+				$address_delimiter = empty( $venue_address ) ? ' ' : ', ';
 
-                // These details are already escaped in various ways earlier in the code.
-                echo implode( $address_delimiter, $venue_details );
-                ?>
-            </div> <!-- .tribe-events-venue-details -->
-        <?php endif; ?>
+				// These details are already escaped in various ways earlier in the code.
+				echo implode( $address_delimiter, $venue_details );
+				?>
+			</div> <!-- .tribe-events-venue-details -->
+		<?php endif; ?>
 
-    </div><!-- .tribe-events-event-meta -->
+	</div><!-- .tribe-events-event-meta -->
 
-    <?php if ( tribe_get_cost() ) : ?>
-        <div class="tribe-events-event-cost">
-            <span class="ticket-cost"><?php echo tribe_get_cost( null, true ); ?></span>
-            <?php
-            /** This action is documented in the-events-calendar/src/views/list/single-event.php */
-            do_action( 'tribe_ext_sch_day_single_inside_cost' )
-            ?>
-        </div>
-    <?php endif; ?>
+	<?php if ( tribe_get_cost() ) : ?>
+		<div class="tribe-events-event-cost">
+			<span class="ticket-cost"><?php echo tribe_get_cost( null, true ); ?></span>
+			<?php
+			/** This action is documented in the-events-calendar/src/views/list/single-event.php */
+			do_action( 'tribe_ext_sch_day_single_inside_cost' )
+			?>
+		</div>
+	<?php endif; ?>
 
-    <?php do_action( 'tribe_ext_sch_day_single_after_the_meta' ) ?>
+	<?php do_action( 'tribe_ext_sch_day_single_after_the_meta' ) ?>
 
-    <!-- Event Content -->
-    <?php do_action( 'tribe_ext_sch_day_single_before_the_content' ) ?>
-        <a href="<?php echo esc_url( tribe_get_event_link() ); ?>" class="tribe-events-read-more" rel="bookmark">
-            <?php esc_html_e( 'Event Details', 'the-events-calendar' ) ?> &raquo;
-        </a>
-    <?php do_action( 'tribe_ext_sch_day_single_after_the_content' ); ?>
+	<!-- Event Content -->
+	<?php do_action( 'tribe_ext_sch_day_single_before_the_content' ) ?>
+		<a href="<?php echo esc_url( tribe_get_event_link() ); ?>" class="tribe-events-read-more" rel="bookmark">
+			<?php esc_html_e( 'Event Details', 'the-events-calendar' ) ?> &raquo;
+		</a>
+	<?php do_action( 'tribe_ext_sch_day_single_after_the_content' ); ?>
 
 </div>
