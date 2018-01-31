@@ -1,13 +1,11 @@
 <?php
 /**
  * Plugin Name:     The Events Calendar Extension: Schedule Day View
- * Description:     Overrides The Events Calendar's Day View with a Schedule Day View, displaying events within All Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now.
- * Version:         1.0.0
- * Extension Class: Tribe__Extension__Example
- * Author:          Modern Tribe, Inc.
- * Author URI:      http://m.tri.be/1971
- * License:         GPL version 3 or any later version
- * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
+ * Description:     Overrides The Events Calendar's Day View with a Schedule Day View, displaying events within All
+ * Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now. Version:
+ * 1.0.0 Extension Class: Tribe__Extension__Example Author:          Modern Tribe, Inc. Author URI:
+ * http://m.tri.be/1971 License:         GPL version 3 or any later version License URI:
+ * https://www.gnu.org/licenses/gpl-3.0.html
  *
  *     This plugin is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -34,6 +32,7 @@ class Tribe__Extension__Example extends Tribe__Extension {
 	private function templates() {
 		return
 			[
+				'day/single.php'          => 'src/views/day/single.php',
 				'day/single-event.php'    => 'src/views/day/single.php',
 				'day/single-featured.php' => 'src/views/day/single.php',
 				'day/loop.php'            => 'src/views/day/loop.php',
@@ -54,7 +53,7 @@ class Tribe__Extension__Example extends Tribe__Extension {
 	/**
 	 * Filters templates to use our overrides.
 	 */
-	private function setup_templates(){
+	private function setup_templates() {
 		foreach ( $this->templates() as $template => $new_template ) {
 			add_filter( 'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
 				// Return the path for our file.
@@ -83,9 +82,13 @@ class Tribe__Extension__Example extends Tribe__Extension {
 	}
 
 	private function setup_loop() {
-		global $posts;
-		add_action( 'tribe_ext_sch_day_inside_before_loop', function( $posts ) {
-			sleep(2);
+		add_action( 'tribe_ext_sch_day_inside_before_loop', function () {
+			global $wp_query;
+
+			foreach ( $wp_query->posts as &$post ) {
+				// @TODO: update the ->timeslot
+				// @TODO: add data-attributes
+			}
 		} );
 	}
 
