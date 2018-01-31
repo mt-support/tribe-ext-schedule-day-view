@@ -18,6 +18,8 @@ global $more, $post, $wp_query;
 $more = false;
 $current_timeslot = null;
 
+$today = Tribe__Extension__Schedule_Day_View::today();
+
 ?>
 
 <div id="tribe-events-day" class="tribe-events-loop">

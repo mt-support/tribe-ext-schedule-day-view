@@ -174,4 +174,10 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		} );
 	}
 
+	public static function today() {
+		global $wp_query;
+
+		return get_query_var( 'eventDate' ) == date( 'Y-m-d', time() );
+	}
+
 }
