@@ -49,8 +49,8 @@ $today            = Tribe__Extension__Schedule_Day_View::today();
 
         <div
             class="tribe-events-day-time-slot<?php echo $class_group_active_on_load; ?>"
-            data-groupstart="<?php echo $post->timeslots['start']; ?>"
-            data-groupend="<?php echo $post->timeslots['end']; ?>"
+            data-tribe-groupstart="<?php echo $post->timeslots['start']; ?>"
+            data-tribe-groupend="<?php echo $post->timeslots['end']; ?>"
         >
             <h5>
                 <button
@@ -68,7 +68,7 @@ $today            = Tribe__Extension__Schedule_Day_View::today();
                 class="<?php tribe_events_event_classes( 'tribe-events-day-group-event' ); ?>"
                 aria-hidden="<?php echo $aria_hidden_on_load; ?>"
                 aria-labelledby="post-trigger-<?php the_ID(); ?>"
-                data-start="<?php
+                data-tribe-group-event-start="<?php
                      // We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
                      $start = sprintf(
                          '%s %s',
@@ -76,8 +76,8 @@ $today            = Tribe__Extension__Schedule_Day_View::today();
                          Tribe__Events__Timezones::get_event_timezone_string( $post->ID )
                      );
                      echo esc_attr( strtotime( $start ) );
-                 ?>"
-                 data-end="<?php
+                ?>"
+                data-tribe-group-event-end="<?php
                      // We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
                      $end = sprintf(
                          '%s %s',
@@ -85,7 +85,7 @@ $today            = Tribe__Extension__Schedule_Day_View::today();
                          Tribe__Events__Timezones::get_event_timezone_string( $post->ID )
                      );
                      echo esc_attr( strtotime( $end ) );
-                 ?>"
+                ?>"
             >
                 <?php tribe_get_template_part( 'day/single' ); ?>
             </div>
