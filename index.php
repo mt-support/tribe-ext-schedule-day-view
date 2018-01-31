@@ -2,11 +2,13 @@
 /**
  * Plugin Name:     The Events Calendar Extension: Schedule Day View
  * Description:     Overrides The Events Calendar's Day View with a Schedule Day View, displaying events within All
- * Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now. Version: 1.0.0
+ * Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now.
+ * Version:         1.0.0
  * Extension Class: Tribe__Extension__Schedule_Day_View
- * Author:          Modern Tribe, Inc. Author URI:
- * http://m.tri.be/1971 License:         GPL version 3 or any later version License URI:
- * https://www.gnu.org/licenses/gpl-3.0.html
+ * Author:          Modern Tribe, Inc.
+ * Author URI:      http://m.tri.be/1971
+ * License:         GPL version 3 or any later version
+ * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  *
  *     This plugin is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,6 +31,7 @@ if ( ! class_exists( 'Tribe__Extension' ) ) {
  */
 class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
+	const PREFIX = 'tribe_ext_sch_day_view';
 
 	private function templates() {
 		return
@@ -49,6 +52,9 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	public function init() {
 		$this->setup_templates();
 		$this->setup_loop();
+		$this->display_cleanup();
+		add_action( 'init', array( $this, 'register_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets' ) );
 		$this->setup_plain_language_redirect();
 	}
 
@@ -57,10 +63,32 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 */
 	private function setup_templates() {
 		foreach ( $this->templates() as $template => $new_template ) {
-			add_filter( 'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
+			add_filter(
+				'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
 				// Return the path for our file.
 				return plugin_dir_path( __FILE__ ) . $new_template;
-			}, 10, 3 );
+			}, 10, 3
+			);
+		}
+	}
+
+	/**
+	 * Load this view's assets.
+	 */
+	public function register_assets() {
+		$resources_url = trailingslashit( plugin_dir_url( __FILE__ ) ) . 'src/resources/';
+
+		wp_register_style( self::PREFIX, $resources_url . 'css/style.css', array( 'tribe-events-calendar-style' ), $this->get_version() );
+		wp_register_script( self::PREFIX . '_js', $resources_url . 'js/script.js', array( 'tribe-moment' ), $this->get_version(), true );
+	}
+
+	/**
+	 * Load this view's assets.
+	 */
+	public function load_assets() {
+		if ( tribe_is_day() ) {
+			wp_enqueue_style( self::PREFIX );
+			wp_enqueue_script( self::PREFIX . '_js' );
 		}
 	}
 
@@ -74,49 +102,35 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	protected function get_time_of_day_ranges() {
 		return [
 			__( 'Morning', 'tribe-ext-schedule-day-view' )   => [
-				6,
-				7,
-				8,
-				9,
-				10,
-				11,
+				6, 7, 8, 9, 10, 11,
 			],
 			__( 'Afternoon', 'tribe-ext-schedule-day-view' ) => [
-				12,
-				13,
-				14,
-				15,
-				16,
+				12, 13, 14, 15, 16,
 			],
 			__( 'Evening', 'tribe-ext-schedule-day-view' )   => [
-				17,
-				18,
-				19,
-				20,
+				17, 18, 19, 20,
 			],
 			__( 'Night', 'tribe-ext-schedule-day-view' )     => [
-				21,
-				22,
-				23,
-				0,
-				1,
-				2,
-				3,
-				4,
-				5,
+				21, 22, 23, 0, 1, 2, 3, 4, 5,
 			],
 		];
 	}
 
 	private function setup_loop() {
-		add_action( 'tribe_ext_sch_day_inside_before_loop', function () {
+		add_action(
+			'tribe_ext_sch_day_inside_before_loop', function () {
 			global $wp_query;
 
 			foreach ( $wp_query->posts as &$post ) {
-				$post->timeslot  = $this->get_timeslot( $post->timeslot );
+				if ( tribe_event_is_all_day( $post->ID ) ) {
+					$post->timeslot  = __( 'All Day', 'tribe-ext-schedule-day-view' );
+				} else {
+					$post->timeslot  = $this->get_timeslot( $post->timeslot );
+				}
 				$post->timeslots = $this->get_js_timeslots();
 			}
-		} );
+		}
+		);
 	}
 
 	private function get_timeslot( $timeslot ) {
@@ -149,6 +163,23 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		global $post;
 
 		return (bool) tribe( 'tec.featured_events' )->is_featured( $post->ID );
+	}
+
+	private function display_cleanup() {
+		add_filter( 'tribe_events_recurrence_tooltip', function( $tooltip ) {
+			return '';
+		}, 10, 1 );
+
+		add_filter( 'tribe_get_venue_details', function( $venue_details ) {
+			unset( $venue_details['address'] );
+			return $venue_details;
+		} );
+	}
+
+	public static function today() {
+		global $wp_query;
+
+		return get_query_var( 'eventDate' ) == date( 'Y-m-d', time() );
 	}
 
 	private function setup_plain_language_redirect() {

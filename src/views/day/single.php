@@ -24,10 +24,6 @@ $has_venue_address = ( ! empty( $venue_details['address'] ) ) ? ' location' : ''
 // no address, so let's get the address string on its own for a couple of checks below.
 $venue_address = tribe_get_address();
 
-// Be like the-events-calendar/src/views/day/single-featured.php
-if ( Tribe__Extension__Schedule_Day_View::instance()->is_featured_event() ) {
-	echo tribe_event_featured_image( null, 'large' );
-}
 ?>
 
 	<!-- Event Title -->
@@ -73,14 +69,6 @@ if ( Tribe__Extension__Schedule_Day_View::instance()->is_featured_event() ) {
 <?php endif; ?>
 
 <?php do_action( 'tribe_ext_sch_day_single_after_the_meta' ) ?>
-
-	<!-- Event Image -->
-<?php
-// Be like the-events-calendar/src/views/day/single-event.php
-if ( ! Tribe__Extension__Schedule_Day_View::instance()->is_featured_event() ) {
-	echo tribe_event_featured_image( null, 'medium' );
-}
-?>
 
 	<!-- Event Content -->
 <?php do_action( 'tribe_ext_sch_day_single_before_the_content' ) ?>
