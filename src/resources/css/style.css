@@ -32,7 +32,12 @@
 .tribe-events-day .tribe-events-day-time-slot .type-tribe_events {
 	margin-left: auto;
 	margin-right: auto;
-	padding: 20px;
+	padding: 20px 20px 20px 17px;
+	border-left: 3px solid transparent;
+}
+
+.tribe-events-day .tribe-events-day-time-slot .type-tribe_events.tribe-events-day-grouping-event-is-active {
+	border-left-color: red;
 }
 
 .tribe-events-day .tribe-events-list .tribe-events-loop .type-tribe_events[class*="tribe-events-venue-"] .tribe-events-event-meta {
