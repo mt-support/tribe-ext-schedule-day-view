@@ -1,0 +1,32 @@
+/**
+ * The Events Calendar Schedule Day View Stylesheet
+ *
+ * @package TribeEventsCalendarPro
+ *
+ */
+
+
+.tribe-events-day-group-trigger {
+
+}
+
+.tribe-events-day-group-trigger span {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+}
+
+
+.post-tribe-events-day-group-event {
+	display: none;
+}
+
+.tribe-events-day-grouping-is-active .post-tribe-events-day-group-event {
+	display: block;
+}
+

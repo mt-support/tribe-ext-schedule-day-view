@@ -44,7 +44,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	public function construct() {
-		$this->add_required_plugin( 'Tribe__Events__Main' );
+		// Tribe__Assets::maybe_get_min_file() requires v4.3
+		$this->add_required_plugin( 'Tribe__Events__Main', '4.3' );
 		$this->set_url( 'https://theeventscalendar.com/extensions/schedule-day-view/' );
 	}
 
@@ -80,8 +81,14 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	public function register_assets() {
 		$resources_url = trailingslashit( plugin_dir_url( __FILE__ ) ) . 'src/resources/';
 
-		wp_register_style( self::PREFIX, $resources_url . 'css/style.css', array( 'tribe-events-calendar-style' ), $this->get_version() );
-		wp_register_script( self::PREFIX . '_js', $resources_url . 'js/script.js', array( 'tribe-moment' ), $this->get_version(), true );
+		$css = $resources_url . 'css/style.css';
+		$css = Tribe__Assets::maybe_get_min_file( $css );
+
+		$js = $resources_url . 'js/script.js';
+		$js = Tribe__Assets::maybe_get_min_file( $js );
+
+		wp_register_style( self::PREFIX, $css, array( 'tribe-events-calendar-style' ), $this->get_version() );
+		wp_register_script( self::PREFIX . '_js', $js, array( 'tribe-moment' ), $this->get_version(), true );
 	}
 
 	/**
