@@ -30,13 +30,16 @@ if ( ! class_exists( 'Tribe__Extension' ) ) {
  */
 class Tribe__Extension__Example extends Tribe__Extension {
 
-	//!!! fatal !!! -- Arrays are not allowed in class constants
-	/**
-	 const SINGLE_TYPES = [
-		'event',
-		'featured',
-	];
-	 */
+
+	private function templates() {
+		return
+			[
+				'day/single-event.php'    => 'views/day/single.php',
+				'day/single-featured.php' => 'views/day/single.php',
+				'day/loop.php'            => 'views/day/loop.php',
+			];
+	}
+
 
 	public function construct() {
 		$this->add_required_plugin( 'Tribe__Events__Main' );
@@ -44,40 +47,12 @@ class Tribe__Extension__Example extends Tribe__Extension {
 	}
 
 	public function init() {
-		foreach ( self::SINGLE_TYPES as $template => $new_template ) {
+		foreach ( $this->templates() as $template => $new_template ) {
 			add_filter( 'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
 				// Return the path for our file.
 				return plugin_dir_path( __FILE__ ) . $new_template;
 			}, 10, 3 );
 		}
-
-
-		add_filter( 'tribe_events_template_day/loop.php', array( $this, 'override_day_loop_template' ) );
-		add_filter( 'tribe_events_template_day/single.php', array( $this, 'override_day_single_template' ) );
-
-/*		foreach ( self::SINGLE_TYPES as $type ) {
-			//tribe_events_template_paths
-			add_filter( 'tribe_get_template_part_day_single_' . $type, array( $this, 'filter_day_view' ), 10, 5 );
-		}*/
-
-	}
-
-	public function get_our_template_dir() {
-		$dir = trailingslashit( plugin_dir_path( __FILE__ ) ) . 'src/views/day/';
-
-		return $dir;
-	}
-
-	public function override_day_loop_template( $file ) {
-		$file = $this->get_our_template_dir() . 'loop.php';
-
-		return $file;
-	}
-
-	public function override_day_single_event_template( $file ) {
-		$file = $this->get_our_template_dir() . 'single.php';
-
-		return $file;
 	}
 
 	/**
