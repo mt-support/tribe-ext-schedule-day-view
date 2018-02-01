@@ -33,6 +33,12 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
 	const PREFIX = 'tribe_ext_sch_day_view';
 
+	public $current_timeslot_args = array();
+
+	public function timeslot_name() {
+		return self::PREFIX . '_timeslot';
+	}
+
 	private function templates() {
 		return
 			[
@@ -124,6 +130,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 * @return array
 	 */
 	protected function get_time_of_day_ranges() {
+		// TODO: sanitize_key()? for array keys to not break
 		return [
 			__( 'Morning', 'tribe-ext-schedule-day-view' )   => [
 				6,
@@ -160,29 +167,31 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		];
 	}
 
+	public function get_all_day_text() {
+		return esc_html__( 'All Day', 'tribe-ext-schedule-day-view' );
+	}
+
 	private function setup_loop() {
 		add_action(
 			'tribe_ext_sch_day_inside_before_loop', function () {
 			global $wp_query;
 
+			$wp_query->set('timeslots', $this->get_js_timeslots() );
+
+			$timeslot_name = $this->timeslot_name();
+
 			foreach ( $wp_query->posts as &$post ) {
 				if ( tribe_event_is_all_day( $post->ID ) ) {
-					$post->timeslot = __( 'All Day', 'tribe-ext-schedule-day-view' );
+					$post->$timeslot_name = $this->get_all_day_text();
 				} else {
-					$post->timeslot = $this->get_timeslot( $post->timeslot );
+					$post->$timeslot_name = $this->get_non_all_day_timeslot_name( $post->ID ); // TODO: properly set based on within timestamps
 				}
 
-				$post->timeslots         = $this->get_js_timeslots( $post->timeslot, $post->ID );
-				$post->is_active_on_load = $this->active(
-					[
-						'all_day'    => ( 'All Day' == $post->timeslot ),
-						'timeslots'  => $post->timeslots,
-						'group_name' => $post->timeslot,
-					]
-				);
+
+				$post->is_active_on_load = $this->active( $post );
 
 				if ( $post->is_active_on_load ) {
-					$active_timeslots[] = $post->timeslot;
+					$active_timeslots[] = $post->$timeslot_name;
 				}
 			}
 
@@ -193,37 +202,118 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		);
 	}
 
-	private function get_timeslot( $timeslot ) {
-		$hour = date( 'G', strtotime( $timeslot ) );
+	// TODO remove keys unused by template
+	public function build_current_timeslot_args( $timeslot ) {
+			global $wp_query;
+
+			$args = array(
+				'is_all_day_timeslot'        => $timeslot === Tribe__Extension__Schedule_Day_View::instance()->get_all_day_text(),
+			'is_active_on_load'          => in_array( $timeslot, $wp_query->active_timeslots ) ? true : false,
+		);
+
+			$args['class_group_active_on_load'] = $args['is_active_on_load'] ? ' tribe-events-day-grouping-is-active' : '';
+			$args['class_group_active_events_on_load'] = $args['is_active_on_load'] ? ' tribe-events-day-grouping-event-is-active' : '';
+			$args['aria_expanded_on_load'] = $args['is_active_on_load'] ? 'true' : 'false';
+			$args['aria_hidden_on_load'] = $args['is_active_on_load'] ? 'false' : 'true';
+			$args['timeslot_id'] = $this->get_timeslot_id_from_timeslot($timeslot);
+			// TODO can add count to timeslot button text
+			$args['button_id'] = $this->get_button_id_from_timeslot($timeslot);
+			$args['start_timestamp'] = $this->get_timeslot_timestamp($timeslot);
+			$args['end_timestamp'] = $this->get_timeslot_timestamp($timeslot, false);
+
+			$this->current_timeslot_args = $args;
+	}
+
+	public function get_timestamp( $post_id, $start_end = 'Start' ) {
+		// We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
+		$time = sprintf(
+			'%s %s',
+			get_post_meta( $post_id, "_Event{$start_end}Date", true ),
+			Tribe__Events__Timezones::get_event_timezone_string( $post_id )
+		);
+
+		return strtotime( $time );
+	}
+
+	private function get_non_all_day_timeslot_name( $post_id ) {
+		$timezone = Tribe__Events__Timezones::wp_timezone_string();
+
+		$existing_timezone = date_default_timezone_get(); // will fallback to UTC but may also return a TZ environment variable (e.g. EST)
+
+		if ( ! in_array( $timezone, timezone_identifiers_list() ) ) {
+			$timezone = get_option( 'timezone_string' ); // could return NULL
+		}
+
+		if ( empty( $timezone ) ) {
+			$timezone = $existing_timezone;
+		}
+
+		date_default_timezone_set( $timezone );
+
+		$hour = date_i18n( 'G', $this->get_timestamp( $post_id ) );
+
+		// set back to what date_default_timezone_get() was
+		date_default_timezone_set( $existing_timezone );
 
 		foreach ( $this->get_time_of_day_ranges() as $time_of_day => $hours ) {
 			if ( in_array( $hour, $hours ) ) {
 				return $time_of_day;
 			}
 		}
-
-		return $timeslot;
 	}
 
-	private function get_js_timeslots( $timeslot, $id ) {
-		if ( array_key_exists( $timeslot, $this->get_time_of_day_ranges() ) ) {
-			$start = sprintf(
-				'%s %s',
-				get_post_meta( $id, "_EventStartDateUTC", true ),
-				get_post_meta( $id, "_EventTimezone", true )
-			);
+	/**
+	 *
+	 * @see \Tribe__Events__Template__Day::header_attributes()
+	 */
+	private function get_today_midnight_timestamp() {
+		global $wp_query;
 
-			$end = sprintf(
-				'%s %s',
-				get_post_meta( $id, "_EventEndDateUTC", true ),
-				get_post_meta( $id, "_EventTimezone", true )
-			);
+		// 'start_date' is actually set to 12:00:01 (bug) so we don't use that query_var
+		$current_day_midnight = sprintf(
+			'%s 00:00:00 %s',
+			$wp_query->get( 'eventDate' ),
+			Tribe__Events__Timezones::wp_timezone_string()
+		);
 
-			return [
-				'start' => strtotime( $start ),
-				'end'   => strtotime( $end ),
+		return strtotime( $current_day_midnight );
+	}
+
+	/**
+	 *
+	 * @see \Tribe__Events__Template__Day::header_attributes()
+	 * @see \Tribe__Extension__Schedule_Day_View::today() TODO: try to be more consistent between this and that.
+	 */
+	private function get_today_ymd() {
+		return date( 'Y-m-d', $this->get_today_midnight_timestamp() );
+	}
+
+	private function get_js_timeslots() {
+		$today_ymd = $this->get_today_ymd();
+
+		$timeslot_timestamps = array();
+
+		foreach ( $this->get_time_of_day_ranges() as $time_of_day => $hours ) {
+			$start_hour = $hours[0];
+			if ( 6 > $start_hour ) {
+				$start_hour = 24 + 6;
+			}
+			$start_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $start_hour );
+
+			$end_hour = end( $hours );
+			reset( $hours );
+			if ( 6 > $end_hour ) {
+				$end_hour = 24 + 6;
+			}
+			$end_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $end_hour );
+
+			$timeslot_timestamps[$time_of_day] = [
+				'start' => strtotime( $start_hour_string ),
+				'end'   => strtotime( $end_hour_string ) - 1, // one second less than the start of next start time
 			];
 		}
+
+		return $timeslot_timestamps;
 	}
 
 	/**
@@ -240,37 +330,84 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	private function display_cleanup() {
-		add_filter( 'tribe_events_recurrence_tooltip', function ( $tooltip ) {
+		add_filter(
+			'tribe_events_recurrence_tooltip', function ( $tooltip ) {
 			return '';
-		}, 10, 1 );
+		}, 10, 1
+		);
 
-		add_filter( 'tribe_get_venue_details', function ( $venue_details ) {
+		add_filter(
+			'tribe_get_venue_details', function ( $venue_details ) {
 			unset( $venue_details['address'] );
 
 			return $venue_details;
-		} );
+		}
+		);
 	}
 
-	public static function today() {
-		return get_query_var( 'eventDate' ) == date( 'Y-m-d', time() );
+	public function today() {
+		global $wp_query;
+
+		if ( $this->get_today_ymd() === $wp_query->get( 'eventDate' )){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	public function active( $args ) {
-		if ( ! self::today() ) {
+	// to only be used in the loop
+	public function active( $post ) {
+		$timeslot_name = $this->timeslot_name();
+
+		if ( ! $this->today() ) {
 			return true;
 		}
 
-		if ( $args['all_day'] ) {
+		if ( $this->get_all_day_text() === $post->$timeslot_name ) {
 			return true;
 		}
 
-		$offset = get_option( 'gmt_offset' );
-		$time   = time() - ( HOUR_IN_SECONDS * $offset );
-		if ( $time >= $args['timeslots']['start'] && $time < $args['timeslots']['end'] ) {
+		$now = time();
+
+		if (
+			$now >= $this->get_timeslot_timestamp( $post->$timeslot_name )
+			&& $now <= $this->get_timeslot_timestamp( $post->$timeslot_name, false )
+		) {
 			return true;
 		}
 
 		return false;
+	}
+
+	public function get_timeslot_timestamp( $timeslot = '', $start = true ) {
+		global $wp_query;
+
+		if (
+			empty( $timeslot)
+			|| $this->get_all_day_text() === $timeslot
+		){
+			return '';
+		}
+
+		if ( $start ) {
+			return $wp_query->get( 'timeslots' )[$timeslot]['start'];
+		} else {
+			return $wp_query->get( 'timeslots' )[$timeslot]['end'];
+		}
+	}
+
+	private function get_timeslot_id_from_timeslot($timeslot='') {
+		if ( ! empty( $timeslot )) {
+			$timeslot = str_replace( ' ', '-', $timeslot ); // e.g. All Day becomes All-Day
+			return 'tribe-events-day-time-slot-' . esc_attr( $timeslot );
+		}
+	}
+
+	private function get_button_id_from_timeslot($timeslot='') {
+		if ( ! empty( $timeslot )) {
+			$timeslot = str_replace( ' ', '-', $timeslot ); // e.g. All Day becomes All-Day
+			return 'timeslot-trigger-' . esc_attr( $timeslot );
+		}
 	}
 
 	private function setup_plain_language_redirect() {

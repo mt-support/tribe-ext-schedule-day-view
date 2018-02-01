@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
 
+global $post;
+
 $venue_details = tribe_get_venue_details();
 
 // Venue microformats
@@ -23,7 +25,32 @@ $has_venue = $venue_details ? ' vcard' : '';
 // no address, so let's get the address string on its own for a couple of checks below.
 $venue_address = tribe_get_address();
 
+$current_timeslot_args = Tribe__Extension__Schedule_Day_View::instance()->current_timeslot_args;
 ?>
+<div
+	id="post-<?php the_ID(); ?>"
+	class="<?php tribe_events_event_classes( $post->ID ); ?> post-tribe-events-day-group-event"
+	aria-hidden="<?php echo $current_timeslot_args['aria_hidden_on_load']; ?>"
+	aria-labelledby="<?php echo $current_timeslot_args['button_id']; ?>"
+	data-tribe-group-event-start="<?php
+		 // We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
+		 $start = sprintf(
+			 '%s %s',
+			 get_post_meta( $post->ID, "_EventStartDate", true ),
+			 Tribe__Events__Timezones::get_event_timezone_string( $post->ID )
+		 );
+		 echo esc_attr( strtotime( $start ) );
+	?>"
+	data-tribe-group-event-end="<?php
+		 // We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
+		 $end = sprintf(
+			 '%s %s',
+			 get_post_meta( $post->ID, "_EventEndDate", true ),
+			 Tribe__Events__Timezones::get_event_timezone_string( $post->ID )
+		 );
+		 echo esc_attr( strtotime( $end ) );
+	?>"
+>
 
 <!-- Schedule & Recurrence Details -->
 <div class="tribe-updated published time-details">
@@ -74,8 +101,10 @@ $venue_address = tribe_get_address();
 	<!-- Event Content -->
 	<?php do_action( 'tribe_ext_sch_day_single_before_the_content' ) ?>
 		<a href="<?php echo esc_url( tribe_get_event_link() ); ?>" class="tribe-events-read-more" rel="bookmark">
-			<?php esc_html_e( 'Event Details', 'the-events-calendar' ) ?> &raquo;
+			<?php esc_html_e( 'Event Details', 'tribe-ext-schedule-day-view' ) ?> &raquo;
 		</a>
 	<?php do_action( 'tribe_ext_sch_day_single_after_the_content' ); ?>
 
-</div>
+</div><!-- .tribe-events-day-event-content -->
+</div><!-- .tribe-events-day-group-event -->
+
