@@ -59,10 +59,12 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		// Load assets for main archive Day View
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
 		// Load assets for PRO shortcode
-		add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array(
-			$this,
-			'load_assets_in_day_view_shortcode',
-		) );
+		add_action(
+			'tribe_events_pro_tribe_events_shortcode_prepare_day', array(
+				$this,
+				'load_assets_in_day_view_shortcode',
+			)
+		);
 		$this->setup_plain_language_redirect();
 	}
 
@@ -169,12 +171,16 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 				} else {
 					$post->timeslot = $this->get_timeslot( $post->timeslot );
 				}
+
 				$post->timeslots         = $this->get_js_timeslots( $post->timeslot, $post->ID );
-				$post->is_active_on_load = $this->active( [
-					'all_day'    => ( 'All Day' == $post->timeslot ),
-					'timeslots'  => $post->timeslots,
-					'group_name' => $post->timeslot,
-				] );
+				$post->is_active_on_load = $this->active(
+					[
+						'all_day'    => ( 'All Day' == $post->timeslot ),
+						'timeslots'  => $post->timeslots,
+						'group_name' => $post->timeslot,
+					]
+				);
+
 				if ( $post->is_active_on_load ) {
 					$active_timeslots[] = $post->timeslot;
 				}
@@ -183,7 +189,6 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			$wp_query->active_timeslots = array_unique( $active_timeslots );
 
 			$wp_query->rewind_posts();
-
 		}
 		);
 	}
@@ -201,20 +206,18 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	private function get_js_timeslots( $timeslot, $id ) {
-
 		if ( array_key_exists( $timeslot, $this->get_time_of_day_ranges() ) ) {
 			$start = sprintf(
 				'%s %s',
 				get_post_meta( $id, "_EventStartDateUTC", true ),
 				get_post_meta( $id, "_EventTimezone", true )
 			);
-			$end   = sprintf(
+
+			$end = sprintf(
 				'%s %s',
 				get_post_meta( $id, "_EventEndDateUTC", true ),
 				get_post_meta( $id, "_EventTimezone", true )
 			);
-
-			sleep( 0 );
 
 			return [
 				'start' => strtotime( $start ),
@@ -237,19 +240,15 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	private function display_cleanup() {
-		add_filter(
-			'tribe_events_recurrence_tooltip', function ( $tooltip ) {
+		add_filter( 'tribe_events_recurrence_tooltip', function ( $tooltip ) {
 			return '';
-		}, 10, 1
-		);
+		}, 10, 1 );
 
-		add_filter(
-			'tribe_get_venue_details', function ( $venue_details ) {
+		add_filter( 'tribe_get_venue_details', function ( $venue_details ) {
 			unset( $venue_details['address'] );
 
 			return $venue_details;
-		}
-		);
+		} );
 	}
 
 	public static function today() {
@@ -276,9 +275,11 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
 	private function setup_plain_language_redirect() {
 
-		add_filter( 'query_vars', function ( $vars ) {
+		add_filter(
+			'query_vars', function ( $vars ) {
 			return array_merge( $vars, [ 'eventDateModified' ], [ 'eventWeekModified' ], [ 'eventMonthModified' ] );
-		}, 10, 1 );
+		}, 10, 1
+		);
 
 		$plane_language = [
 			__( 'events/tomorrow', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventDateModified=1',
@@ -292,16 +293,19 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			__( 'events/month', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventMonthModified=$matches[1]&eventDisplay=month',
 		];
 
-		add_filter( 'rewrite_rules_array', function ( $rules ) use ( $plane_language ) {
+		add_filter(
+			'rewrite_rules_array', function ( $rules ) use ( $plane_language ) {
 			$new_rules = array_merge(
 				$plane_language,
 				$rules
 			);
 
 			return $new_rules;
-		}, 10, 1 );
+		}, 10, 1
+		);
 
-		add_filter( 'pre_get_posts', function ( $query ) {
+		add_filter(
+			'pre_get_posts', function ( $query ) {
 			if ( get_query_var( 'eventDateModified' ) ) {
 				$offset = date( 'Y-m-d', time() + ( DAY_IN_SECONDS * get_query_var( 'eventDateModified' ) ) );
 				$query->set( 'eventDate', $offset );
@@ -318,7 +322,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			}
 
 			return $query;
-		} );
+		}
+		);
 	}
 
 }
