@@ -29,7 +29,7 @@ $current_timeslot_args = Tribe__Extension__Schedule_Day_View::instance()->curren
 ?>
 <div
 	id="post-<?php the_ID(); ?>"
-	class="<?php tribe_events_event_classes( $post->ID ); ?> post-tribe-events-day-group-event"
+	class="<?php tribe_events_event_classes( $post->ID ); ?> post-tribe-events-day-group-event <?php echo $current_timeslot_args['class_group_active_events_on_load']; ?>"
 	aria-hidden="<?php echo $current_timeslot_args['aria_hidden_on_load']; ?>"
 	aria-labelledby="<?php echo $current_timeslot_args['button_id']; ?>"
 	data-tribe-group-event-start="<?php
