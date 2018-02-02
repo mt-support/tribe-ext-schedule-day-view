@@ -50,6 +50,7 @@ $all_day_text = Tribe__Extension__Schedule_Day_View::instance()->get_all_day_tex
 		class="tribe-events-day-time-slot<?php echo $current_timeslot_args['class_group_active_on_load']; ?>"
 		data-tribe-groupstart="<?php echo $current_timeslot_args['start_timestamp']; ?>"
 		data-tribe-groupend="<?php echo $current_timeslot_args['end_timestamp']; ?>"
+		data-tribe-groupeventscount="<?php echo $current_timeslot_args['timeslot_event_count']; ?>"
 	>
 		<h5>
 			<button
@@ -57,7 +58,7 @@ $all_day_text = Tribe__Extension__Schedule_Day_View::instance()->get_all_day_tex
 				class="tribe-events-day-group-trigger"
 				aria-expanded="<?php echo $current_timeslot_args['aria_expanded_on_load']; ?>"
 			>
-				<?php echo $current_timeslot; ?>
+				<?php echo $current_timeslot_args['timeslot_title']; ?>
 				<span><?php _e( "Toggle Group's Events", 'tribe-ext-schedule-day-view' ); ?></span>
 			</button>
 		</h5>

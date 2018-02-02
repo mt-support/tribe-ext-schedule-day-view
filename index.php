@@ -171,6 +171,32 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return esc_html__( 'All Day', 'tribe-ext-schedule-day-view' );
 	}
 
+	private function get_timeslot_event_count( $timeslot ) {
+		global $wp_query;
+
+		if ( empty( $wp_query->timeslot_counts[$timeslot] )){
+			$event_count = 0;
+		} else {
+			$event_count = $wp_query->timeslot_counts[$timeslot];
+		}
+
+		return absint( $event_count );
+	}
+
+	private function get_timeslot_title( $timeslot ) {
+		$event_count = $this->get_timeslot_event_count( $timeslot );
+
+		if ( 0 === $event_count ){
+			$event_count_text = sprintf( __( '(No %s)', 'tribe-ext-schedule-day-view' ), tribe_get_event_label_plural() );
+		} elseif ( 1 === $event_count ){
+			$event_count_text = sprintf( __( '(%d %s)', 'tribe-ext-schedule-day-view' ), $event_count, tribe_get_event_label_singular() );
+		} else {
+			$event_count_text = sprintf( __( '(%d %s)', 'tribe-ext-schedule-day-view' ), $event_count, tribe_get_event_label_plural() );
+		}
+
+		return sprintf( esc_html__( '%s %s', 'tribe-ext-schedule-day-view' ), $timeslot, $event_count_text );
+	}
+
 	private function setup_loop() {
 		add_action(
 			'tribe_ext_sch_day_inside_before_loop', function () {
@@ -180,13 +206,17 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
 			$timeslot_name = $this->timeslot_name();
 
+			$all_timeslots = array();
+			$active_timeslots = array();
+
 			foreach ( $wp_query->posts as &$post ) {
 				if ( tribe_event_is_all_day( $post->ID ) ) {
 					$post->$timeslot_name = $this->get_all_day_text();
 				} else {
-					$post->$timeslot_name = $this->get_non_all_day_timeslot_name( $post->ID ); // TODO: properly set based on within timestamps
+					$post->$timeslot_name = $this->get_non_all_day_timeslot_name( $post->ID );
 				}
 
+				$all_timeslots[] = $post->$timeslot_name;
 
 				$post->is_active_on_load = $this->active( $post );
 
@@ -194,6 +224,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 					$active_timeslots[] = $post->$timeslot_name;
 				}
 			}
+
+			$wp_query->timeslot_counts = array_count_values( $all_timeslots );
 
 			$wp_query->active_timeslots = array_unique( $active_timeslots );
 
@@ -216,7 +248,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			$args['aria_expanded_on_load'] = $args['is_active_on_load'] ? 'true' : 'false';
 			$args['aria_hidden_on_load'] = $args['is_active_on_load'] ? 'false' : 'true';
 			$args['timeslot_id'] = $this->get_timeslot_id_from_timeslot($timeslot);
-			// TODO can add count to timeslot button text
+			$args['timeslot_event_count'] = $this->get_timeslot_event_count($timeslot);
+			$args['timeslot_title'] = $this->get_timeslot_title($timeslot);
 			$args['button_id'] = $this->get_button_id_from_timeslot($timeslot);
 			$args['start_timestamp'] = $this->get_timeslot_timestamp($timeslot);
 			$args['end_timestamp'] = $this->get_timeslot_timestamp($timeslot, false);
