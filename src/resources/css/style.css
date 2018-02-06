@@ -4,13 +4,6 @@
  * @package TribeEventsCalendarPro
  *
  */
-
-#tribe-events-day {
-
-}
-
-
-
 .tribe-events-day #tribe-events #tribe-events-header {
 	margin-bottom: 18px;
 }
@@ -114,9 +107,6 @@
 .tribe-events-day .tribe-events-list .tribe-event-featured .tribe-events-read-more {
 	border-top-color: rgba(0, 0, 0, 0.25);
 }
-
-
-
 
 .tribe-events-day-group-trigger {
 	border-radius: 0;

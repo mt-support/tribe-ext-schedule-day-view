@@ -1,10 +1,10 @@
 /**
- * @file This file contains all schedule day view specific javascript.
- * This file should load after all vendors and core events javascript.
- * @version 1.0
+ * @file This file contains all JavaScript specific to Schedule Day View.
+ * This file should load after all vendor and core events JavaScript.
+ * @version 1.0.0
  */
 
-(function( window, document, $, td, te, tf, ts, tt, config, dbug ) {
+(function ( window, document, $, td, te, tf, ts, tt, config, dbug ) {
 
 	/*
 	 * $    = jQuery
@@ -22,8 +22,7 @@
 	}
 	// @endif
 
-	$( document ).ready( function() {
-
+	$( document ).ready( function () {
 		var $container = $( '#tribe-events-day' ),
 			tribe_timezone = $container.data( 'tribe-timezone' ),
 			tribe_time_on_load = $container.data( 'tribe-now' );
@@ -34,23 +33,23 @@
 		 * @desc Handles toggles for event groups
 		 */
 
-		$( '#tribe-events' ).on( 'click', '.tribe-events-day-group-trigger',function( e ) {
-			var $target = $(e.target),
-				$parent = $target.closest('.tribe-events-day-time-slot'),
-				$content = $parent.find('.post-tribe-events-day-group-event');
+		$( '#tribe-events' ).on( 'click', '.tribe-events-day-group-trigger', function ( e ) {
+			var $target = $( e.target ),
+				$parent = $target.closest( '.tribe-events-day-time-slot' ),
+				$content = $parent.find( '.post-tribe-events-day-group-event' );
 
 			e.preventDefault();
 
-			if ( $parent.is('.tribe-events-day-grouping-is-active') ) {
-				$parent.removeClass('tribe-events-day-grouping-is-active');
-				$target.attr('aria-expanded', false);
-				$content.attr('aria-hidden', true);
+			if ( $parent.is( '.tribe-events-day-grouping-is-active' ) ) {
+				$parent.removeClass( 'tribe-events-day-grouping-is-active' );
+				$target.attr( 'aria-expanded', false );
+				$content.attr( 'aria-hidden', true );
 			} else {
-				$parent.addClass('tribe-events-day-grouping-is-active');
-				$target.attr('aria-expanded', true);
-				$content.attr('aria-hidden', false);
+				$parent.addClass( 'tribe-events-day-grouping-is-active' );
+				$target.attr( 'aria-expanded', true );
+				$content.attr( 'aria-hidden', false );
 			}
-		});
+		} );
 
 
 		// @ifdef DEBUG

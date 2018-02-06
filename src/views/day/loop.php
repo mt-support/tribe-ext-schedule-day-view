@@ -51,6 +51,11 @@ $all_day_text = Tribe__Extension__Schedule_Day_View::instance()->get_all_day_tex
 		data-tribe-groupstart="<?php echo $current_timeslot_args['start_timestamp']; ?>"
 		data-tribe-groupend="<?php echo $current_timeslot_args['end_timestamp']; ?>"
 		data-tribe-groupeventscount="<?php echo $current_timeslot_args['timeslot_event_count']; ?>"
+		<?php
+		if ( ! empty( $current_timeslot_args['timeslot_event_count'] ) ){
+			echo 'data-tribe-grouphasevents';
+		}
+		?>
 	>
 		<h5>
 			<button
