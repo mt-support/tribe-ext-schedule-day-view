@@ -3,8 +3,7 @@
  * Schedule Day View Loop
  * This file sets up the structure for the Schedule Day View loop.
  *
- * TODO:
- * Override this template in your own theme by creating a file at [your-theme]/tribe-events/day/loop.php
+ * While this plugin is active, you cannot override this template in your own theme because it's loaded via a filter from tribe_get_template_part() in this plugin's index.php.
  *
  * @version 1.0.0
  * @package TribeEventsCalendar

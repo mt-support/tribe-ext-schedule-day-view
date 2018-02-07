@@ -3,8 +3,7 @@
  * Day View Single Event
  * This file contains one event in the day view
  *
- * TODO: Add special class to Featured Events
- * Override this template in your own theme by creating a file at [your-theme]/tribe-events/day/single.php
+ * While this plugin is active, you cannot override this template in your own theme because it's loaded via a filter from tribe_get_template_part() in this plugin's index.php.
  *
  * @version 4.5.11
  *
