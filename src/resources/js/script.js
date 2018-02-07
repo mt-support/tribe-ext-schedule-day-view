@@ -33,7 +33,7 @@
 		 * @desc Handles toggles for event groups
 		 */
 
-		$( '#tribe-events' ).on( 'click', '.tribe-events-day-group-trigger', function ( e ) {
+		$( '#tribe-events' ).on( 'click', '.tribe-events-day-group-trigger:enabled', function ( e ) {
 			var $target = $( e.target ),
 				$parent = $target.closest( '.tribe-events-day-time-slot' ),
 				$content = $parent.find( '.post-tribe-events-day-group-event' );

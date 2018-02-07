@@ -174,7 +174,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	private function get_timeslot_event_count( $timeslot ) {
 		global $wp_query;
 
-		if ( empty( $wp_query->timeslot_counts[$timeslot] )){
+		if ( empty( $wp_query->timeslot_counts[$timeslot] ) ) {
 			$event_count = 0;
 		} else {
 			$event_count = $wp_query->timeslot_counts[$timeslot];
@@ -186,9 +186,9 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	private function get_timeslot_title( $timeslot ) {
 		$event_count = $this->get_timeslot_event_count( $timeslot );
 
-		if ( 0 === $event_count ){
+		if ( 0 === $event_count ) {
 			$event_count_text = sprintf( __( '(No %s)', 'tribe-ext-schedule-day-view' ), tribe_get_event_label_plural() );
-		} elseif ( 1 === $event_count ){
+		} elseif ( 1 === $event_count ) {
 			$event_count_text = sprintf( __( '(%d %s)', 'tribe-ext-schedule-day-view' ), $event_count, tribe_get_event_label_singular() );
 		} else {
 			$event_count_text = sprintf( __( '(%d %s)', 'tribe-ext-schedule-day-view' ), $event_count, tribe_get_event_label_plural() );
@@ -202,11 +202,11 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			'tribe_ext_sch_day_inside_before_loop', function () {
 			global $wp_query;
 
-			$wp_query->set('timeslots', $this->get_js_timeslots() );
+			$wp_query->set( 'timeslots', $this->get_js_timeslots() );
 
 			$timeslot_name = $this->timeslot_name();
 
-			$all_timeslots = array();
+			$all_timeslots    = array();
 			$active_timeslots = array();
 
 			foreach ( $wp_query->posts as &$post ) {
@@ -234,27 +234,25 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		);
 	}
 
-	// TODO remove keys unused by template
 	public function build_current_timeslot_args( $timeslot ) {
-			global $wp_query;
+		global $wp_query;
 
-			$args = array(
-				'is_all_day_timeslot'        => $timeslot === Tribe__Extension__Schedule_Day_View::instance()->get_all_day_text(),
-			'is_active_on_load'          => in_array( $timeslot, $wp_query->active_timeslots ) ? true : false,
+		$args = array(
+			'is_all_day_timeslot' => $timeslot === Tribe__Extension__Schedule_Day_View::instance()->get_all_day_text(),
+			'is_active_on_load'   => in_array( $timeslot, $wp_query->active_timeslots ) ? true : false,
 		);
 
-			$args['class_group_active_on_load'] = $args['is_active_on_load'] ? ' tribe-events-day-grouping-is-active' : '';
-			$args['class_group_active_events_on_load'] = $args['is_active_on_load'] ? ' tribe-events-day-grouping-event-is-active' : '';
-			$args['aria_expanded_on_load'] = $args['is_active_on_load'] ? 'true' : 'false';
-			$args['aria_hidden_on_load'] = $args['is_active_on_load'] ? 'false' : 'true';
-			$args['timeslot_id'] = $this->get_timeslot_id_from_timeslot($timeslot);
-			$args['timeslot_event_count'] = $this->get_timeslot_event_count($timeslot);
-			$args['timeslot_title'] = $this->get_timeslot_title($timeslot);
-			$args['button_id'] = $this->get_button_id_from_timeslot($timeslot);
-			$args['start_timestamp'] = $this->get_timeslot_timestamp($timeslot);
-			$args['end_timestamp'] = $this->get_timeslot_timestamp($timeslot, false);
+		$args['class_group_active_events_on_load'] = $args['is_active_on_load'] ? ' tribe-events-day-grouping-event-is-active' : '';
+		$args['aria_expanded_on_load']             = $args['is_active_on_load'] ? 'true' : 'false';
+		$args['aria_hidden_on_load']               = $args['is_active_on_load'] ? 'false' : 'true';
+		$args['timeslot_id']                       = $this->get_timeslot_id_from_timeslot( $timeslot );
+		$args['timeslot_event_count']              = $this->get_timeslot_event_count( $timeslot );
+		$args['timeslot_title']                    = $this->get_timeslot_title( $timeslot );
+		$args['button_id']                         = $this->get_button_id_from_timeslot( $timeslot );
+		$args['start_timestamp']                   = $this->get_timeslot_timestamp( $timeslot );
+		$args['end_timestamp']                     = $this->get_timeslot_timestamp( $timeslot, false );
 
-			$this->current_timeslot_args = $args;
+		$this->current_timeslot_args = $args;
 	}
 
 	public function get_timestamp( $post_id, $start_end = 'Start' ) {
@@ -338,11 +336,12 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			if ( 6 > $end_hour ) {
 				$end_hour = 24 + 6;
 			}
+			$end_hour        += 1; // We actually need the start hour of the next range
 			$end_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $end_hour );
 
 			$timeslot_timestamps[$time_of_day] = [
 				'start' => strtotime( $start_hour_string ),
-				'end'   => strtotime( $end_hour_string ) - 1, // one second less than the start of next start time
+				'end'   => strtotime( $end_hour_string ) - 1, // one second less than the start hour of the next range
 			];
 		}
 
@@ -381,7 +380,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	public function today() {
 		global $wp_query;
 
-		if ( $this->get_today_ymd() === $wp_query->get( 'eventDate' )){
+		if ( $this->get_today_ymd() === $wp_query->get( 'eventDate' ) ) {
 			return true;
 		} else {
 			return false;
@@ -416,9 +415,9 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		global $wp_query;
 
 		if (
-			empty( $timeslot)
+			empty( $timeslot )
 			|| $this->get_all_day_text() === $timeslot
-		){
+		) {
 			return '';
 		}
 
@@ -429,29 +428,30 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		}
 	}
 
-	private function get_timeslot_id_from_timeslot($timeslot='') {
-		if ( ! empty( $timeslot )) {
+	private function get_timeslot_id_from_timeslot( $timeslot = '' ) {
+		if ( ! empty( $timeslot ) ) {
 			$timeslot = str_replace( ' ', '-', $timeslot ); // e.g. All Day becomes All-Day
+
 			return 'tribe-events-day-time-slot-' . esc_attr( $timeslot );
 		}
 	}
 
-	private function get_button_id_from_timeslot($timeslot='') {
-		if ( ! empty( $timeslot )) {
+	private function get_button_id_from_timeslot( $timeslot = '' ) {
+		if ( ! empty( $timeslot ) ) {
 			$timeslot = str_replace( ' ', '-', $timeslot ); // e.g. All Day becomes All-Day
+
 			return 'timeslot-trigger-' . esc_attr( $timeslot );
 		}
 	}
 
 	private function setup_plain_language_redirect() {
-
 		add_filter(
 			'query_vars', function ( $vars ) {
 			return array_merge( $vars, [ 'eventDateModified' ], [ 'eventWeekModified' ], [ 'eventMonthModified' ] );
 		}, 10, 1
 		);
 
-		$plane_language = [
+		$plain_language = [
 			__( 'events/tomorrow', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventDateModified=1',
 			__( 'events/yesterday', 'tribe-ext-schedule-day-view' )               => 'index.php?post_type=tribe_events&eventDateModified=-1',
 			__( 'events/nextweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=1&eventDisplay=week',
@@ -464,9 +464,9 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		];
 
 		add_filter(
-			'rewrite_rules_array', function ( $rules ) use ( $plane_language ) {
+			'rewrite_rules_array', function ( $rules ) use ( $plain_language ) {
 			$new_rules = array_merge(
-				$plane_language,
+				$plain_language,
 				$rules
 			);
 
