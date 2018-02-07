@@ -40,13 +40,12 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	private function templates() {
-		return
-			[
-				'day/single.php'          => 'src/views/day/single.php',
-				'day/single-event.php'    => 'src/views/day/single.php',
-				'day/single-featured.php' => 'src/views/day/single.php',
-				'day/loop.php'            => 'src/views/day/loop.php',
-			];
+		return array(
+			'day/single.php'          => 'src/views/day/single.php',
+			'day/single-event.php'    => 'src/views/day/single.php',
+			'day/single-featured.php' => 'src/views/day/single.php',
+			'day/loop.php'            => 'src/views/day/loop.php',
+		);
 	}
 
 
@@ -130,30 +129,29 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 * @return array
 	 */
 	protected function get_time_of_day_ranges() {
-		// TODO: sanitize_key()? for array keys to not break
-		return [
-			__( 'Morning', 'tribe-ext-schedule-day-view' )   => [
+		return array(
+			__( 'Morning', 'tribe-ext-schedule-day-view' )   => array(
 				6,
 				7,
 				8,
 				9,
 				10,
 				11,
-			],
-			__( 'Afternoon', 'tribe-ext-schedule-day-view' ) => [
+			),
+			__( 'Afternoon', 'tribe-ext-schedule-day-view' ) => array(
 				12,
 				13,
 				14,
 				15,
 				16,
-			],
-			__( 'Evening', 'tribe-ext-schedule-day-view' )   => [
+			),
+			__( 'Evening', 'tribe-ext-schedule-day-view' )   => array(
 				17,
 				18,
 				19,
 				20,
-			],
-			__( 'Night', 'tribe-ext-schedule-day-view' )     => [
+			),
+			__( 'Night', 'tribe-ext-schedule-day-view' )     => array(
 				21,
 				22,
 				23,
@@ -163,8 +161,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 				3,
 				4,
 				5,
-			],
-		];
+			),
+		);
 	}
 
 	public function get_all_day_text() {
@@ -339,10 +337,10 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			$end_hour        += 1; // We actually need the start hour of the next range
 			$end_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $end_hour );
 
-			$timeslot_timestamps[$time_of_day] = [
+			$timeslot_timestamps[$time_of_day] = array(
 				'start' => strtotime( $start_hour_string ),
 				'end'   => strtotime( $end_hour_string ) - 1, // one second less than the start hour of the next range
-			];
+		);
 		}
 
 		return $timeslot_timestamps;
@@ -447,11 +445,11 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	private function setup_plain_language_redirect() {
 		add_filter(
 			'query_vars', function ( $vars ) {
-			return array_merge( $vars, [ 'eventDateModified' ], [ 'eventWeekModified' ], [ 'eventMonthModified' ] );
+			return array_merge( $vars, array( 'eventDateModified' ), array( 'eventWeekModified' ), array( 'eventMonthModified' ) );
 		}, 10, 1
 		);
 
-		$plain_language = [
+		$plain_language = array(
 			__( 'events/tomorrow', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventDateModified=1',
 			__( 'events/yesterday', 'tribe-ext-schedule-day-view' )               => 'index.php?post_type=tribe_events&eventDateModified=-1',
 			__( 'events/nextweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=1&eventDisplay=week',
@@ -461,7 +459,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			__( 'events/today', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventDateModified=$matches[1]',
 			__( 'events/week', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?'  => 'index.php?post_type=tribe_events&eventWeekModified=$matches[1]&eventDisplay=week',
 			__( 'events/month', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventMonthModified=$matches[1]&eventDisplay=month',
-		];
+		);
 
 		add_filter(
 			'rewrite_rules_array', function ( $rules ) use ( $plain_language ) {
