@@ -17,11 +17,11 @@ global $post, $wp_query;
 
 $current_timeslot = null;
 $today            = Tribe__Extension__Schedule_Day_View::instance()->today();
-$class_is_today   = $today ? ' tribe-events-loop-day-today' : '';
+$class_is_today   = $today ? ' tribe-events-loop-day-today' : ' tribe-events-day-grouping-is-active tribe-events-loop-day-not-today';
 
 $all_day_text = Tribe__Extension__Schedule_Day_View::instance()->get_all_day_text();
 
-$now = time();
+$now = Tribe__Extension__Schedule_Day_View::instance()->now_timestamp();
 ?>
 
 <div
@@ -42,14 +42,18 @@ $now = time();
 		$current_timeslot_args = Tribe__Extension__Schedule_Day_View::instance()->current_timeslot_args;
 
 		$active_class = '';
-		if (
-			$current_timeslot_args['is_all_day_timeslot']
-			|| (
-				$now >= $current_timeslot_args['start_timestamp']
-				&& $now <= $current_timeslot_args['end_timestamp']
-			)
-		) {
-			$active_class = ' tribe-events-day-grouping-is-active tribe-events-day-grouping-is-now';
+		if ( $today ) {
+			if (
+				$current_timeslot_args['is_all_day_timeslot']
+				|| (
+					$now >= $current_timeslot_args['start_timestamp']
+					&& $now <= $current_timeslot_args['end_timestamp']
+				)
+			) {
+				$active_class = ' tribe-events-day-grouping-is-active tribe-events-day-grouping-is-now';
+			}
+		} elseif ( ! empty( $current_timeslot_args['timeslot_event_count'] ) ) {
+			$active_class = ' tribe-events-day-grouping-is-active';
 		}
 		?>
 

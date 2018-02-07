@@ -152,7 +152,9 @@
 	display: none;
 }
 
-.tribe-events-day-grouping-is-active .post-tribe-events-day-group-event {
+.tribe-events-loop-day-today .tribe-events-day-grouping-is-now[data-tribe-grouphasevents] .post-tribe-events-day-group-event,
+.tribe-events-loop-day-today .tribe-events-day-grouping-is-active[data-tribe-grouphasevents] .post-tribe-events-day-group-event,
+.tribe-events-loop-day-not-today .tribe-events-day-grouping-is-active[data-tribe-grouphasevents] .post-tribe-events-day-group-event {
 	display: block;
 }
 

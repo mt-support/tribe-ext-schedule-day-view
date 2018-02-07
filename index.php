@@ -99,7 +99,10 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		$js = $resources_url . 'js/script.js';
 		$js = Tribe__Assets::maybe_get_min_file( $js );
 
+		// Just making sure our CSS only loads if The Events Calendar's global CSS successfully loaded.
 		wp_register_style( self::PREFIX, $css, array( 'tribe-events-calendar-style' ), $this->get_version() );
+
+		// We don't actually use any MomentJS in this extension, but it's a way to ensure we're loading after the default The Events Calendar stuff does. Plus, we might want to do some fancier JS stuff in the future, in which case MomentJS would probably come in handy.
 		wp_register_script( self::PREFIX . '_js', $js, array( 'tribe-moment' ), $this->get_version(), true );
 	}
 
@@ -291,33 +294,57 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		}
 	}
 
-	/**
-	 *
-	 * @see \Tribe__Events__Template__Day::header_attributes()
-	 */
-	private function get_today_midnight_timestamp() {
-		global $wp_query;
+	public static function now_timestamp() {
+		$timezone = Tribe__Events__Timezones::wp_timezone_string();
 
-		// 'start_date' is actually set to 12:00:01 (bug) so we don't use that query_var
-		$current_day_midnight = sprintf(
-			'%s 00:00:00 %s',
-			$wp_query->get( 'eventDate' ),
-			Tribe__Events__Timezones::wp_timezone_string()
-		);
+		$existing_timezone = date_default_timezone_get(); // will fallback to UTC but may also return a TZ environment variable (e.g. EST)
 
-		return strtotime( $current_day_midnight );
+		if ( ! in_array( $timezone, timezone_identifiers_list() ) ) {
+			$timezone = get_option( 'timezone_string' ); // could return NULL
+		}
+
+		if ( empty( $timezone ) ) {
+			$timezone = $existing_timezone;
+		}
+
+		date_default_timezone_set( $timezone );
+
+		$now_timestamp = time();
+
+		// set back to what date_default_timezone_get() was
+		date_default_timezone_set( $existing_timezone );
+
+		return $now_timestamp;
 	}
 
 	/**
 	 *
 	 * @see \Tribe__Events__Template__Day::header_attributes()
-	 * @see \Tribe__Extension__Schedule_Day_View::today() TODO: try to be more consistent between this and that.
 	 */
 	private function get_today_ymd() {
-		return date( 'Y-m-d', $this->get_today_midnight_timestamp() );
+		$timezone = Tribe__Events__Timezones::wp_timezone_string();
+
+		$existing_timezone = date_default_timezone_get(); // will fallback to UTC but may also return a TZ environment variable (e.g. EST)
+
+		if ( ! in_array( $timezone, timezone_identifiers_list() ) ) {
+			$timezone = get_option( 'timezone_string' ); // could return NULL
+		}
+
+		if ( empty( $timezone ) ) {
+			$timezone = $existing_timezone;
+		}
+
+		date_default_timezone_set( $timezone );
+
+		$today_ymd = date( 'Y-m-d', self::now_timestamp() );
+
+		// set back to what date_default_timezone_get() was
+		date_default_timezone_set( $existing_timezone );
+
+		return $today_ymd;
 	}
 
-	private function get_js_timeslots() {
+	public function get_js_timeslots() {
 		$today_ymd = $this->get_today_ymd();
 
 		$timeslot_timestamps = array();
@@ -340,7 +367,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			$timeslot_timestamps[$time_of_day] = array(
 				'start' => strtotime( $start_hour_string ),
 				'end'   => strtotime( $end_hour_string ) - 1, // one second less than the start hour of the next range
-		);
+			);
 		}
 
 		return $timeslot_timestamps;
