@@ -96,8 +96,6 @@ if (
 			add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'load_assets_in_day_view_shortcode' ) );
 
 			add_filter( 'tribe_get_events_title', array( $this, 'set_todays_day_view_title' ) );
-
-			$this->setup_plain_language_redirect(); // TODO
 		}
 
 		/**
@@ -625,55 +623,6 @@ if (
 			} else {
 				return '';
 			}
-		}
-
-		/**
-		 * TODO
-		 */
-		private function setup_plain_language_redirect() {
-			add_filter( 'query_vars', function ( $vars ) {
-				return array_merge( $vars, array( 'eventDateModified' ), array( 'eventWeekModified' ), array( 'eventMonthModified' ) );
-			}, 10, 1 );
-
-			$plain_language = array(
-				__( 'events/tomorrow', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventDateModified=1',
-				__( 'events/yesterday', 'tribe-ext-schedule-day-view' )               => 'index.php?post_type=tribe_events&eventDateModified=-1',
-				__( 'events/nextweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=1&eventDisplay=week',
-				__( 'events/lastweek', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventWeekModified=-1&eventDisplay=week',
-				__( 'events/nextmonth', 'tribe-ext-schedule-day-view' )               => 'index.php?post_type=tribe_events&eventMonthModified=1&eventDisplay=month',
-				__( 'events/lastmonth', 'tribe-ext-schedule-day-view' )               => 'index.php?post_type=tribe_events&eventMonthModified=-1&eventDisplay=month',
-				__( 'events/today', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventDateModified=$matches[1]',
-				__( 'events/week', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?'  => 'index.php?post_type=tribe_events&eventWeekModified=$matches[1]&eventDisplay=week',
-				__( 'events/month', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventMonthModified=$matches[1]&eventDisplay=month',
-			);
-
-			add_filter( 'rewrite_rules_array', function ( $rules ) use ( $plain_language ) {
-				$new_rules = array_merge(
-					$plain_language,
-					$rules
-				);
-
-				return $new_rules;
-			}, 10, 1 );
-
-			add_filter( 'pre_get_posts', function ( $query ) {
-				if ( get_query_var( 'eventDateModified' ) ) {
-					$offset = date( 'Y-m-d', time() + ( DAY_IN_SECONDS * get_query_var( 'eventDateModified' ) ) );
-					$query->set( 'eventDate', $offset );
-				}
-
-				if ( get_query_var( 'eventWeekModified' ) ) {
-					$offset = date( 'Y-m-d', time() + ( WEEK_IN_SECONDS * get_query_var( 'eventWeekModified' ) ) );
-					$query->set( 'eventDate', $offset );
-				}
-
-				if ( get_query_var( 'eventMonthModified' ) ) {
-					$offset = date( 'Y-m-d', time() + ( MONTH_IN_SECONDS * get_query_var( 'eventMonthModified' ) ) );
-					$query->set( 'eventDate', $offset );
-				}
-
-				return $query;
-			} );
 		}
 	} // end class
 } // end if class_exists check
