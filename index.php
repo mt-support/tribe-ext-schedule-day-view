@@ -239,7 +239,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		global $wp_query;
 
 		$args = array(
-			'is_all_day_timeslot' => $timeslot === Tribe__Extension__Schedule_Day_View::instance()->get_all_day_text(),
+			'is_all_day_timeslot' => $timeslot === $this->get_all_day_text(),
 			'is_active_on_load'   => in_array( $timeslot, $wp_query->active_timeslots ) ? true : false,
 		);
 
