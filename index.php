@@ -70,6 +70,9 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 				'load_assets_in_day_view_shortcode',
 			)
 		);
+
+		add_filter( 'tribe_get_events_title', array( $this, 'set_todays_day_view_title' ) );
+
 		$this->setup_plain_language_redirect();
 	}
 
@@ -166,6 +169,26 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 				5,
 			),
 		);
+	}
+
+	public function set_todays_day_view_title( $title ) {
+		global $wp_query;
+
+		if (
+			tribe_is_day()
+			&& $this->today()
+		) {
+			if ( 1 === $wp_query->found_posts ) {
+				$title = sprintf( __( "Today's %s", 'tribe-ext-schedule-day-view' ), tribe_get_event_label_singular() );
+			} else {
+				// Either zero events (when a notice would display) or 2+ events
+				$title = sprintf( __( "Today's %s", 'tribe-ext-schedule-day-view' ), tribe_get_event_label_plural() );
+			}
+
+			$title = esc_html( $title );
+		}
+
+		return $title;
 	}
 
 	public function get_all_day_text() {
