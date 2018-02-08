@@ -105,12 +105,10 @@ if (
 		 */
 		private function setup_templates() {
 			foreach ( $this->templates() as $template => $new_template ) {
-				add_filter(
-					'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
+				add_filter( 'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
 					// Return the path for our file.
 					return plugin_dir_path( __FILE__ ) . $new_template;
-				}, 10, 3
-				);
+				}, 10, 3 );
 			}
 		}
 
@@ -282,8 +280,7 @@ if (
 		 * Runs on the initial action hook in the src/views/day/loop.php template.
 		 */
 		private function setup_loop() {
-			add_action(
-				'tribe_ext_sch_day_inside_before_loop', function () {
+			add_action( 'tribe_ext_sch_day_inside_before_loop', function () {
 				global $wp_query;
 
 				$wp_query->set( 'time_slots', $this->get_time_slots_array_of_timestamp_ranges() );
@@ -314,8 +311,7 @@ if (
 				$wp_query->active_time_slots = array_unique( $active_time_slots );
 
 				$wp_query->rewind_posts();
-			}
-			);
+			} );
 		}
 
 		/**
@@ -472,19 +468,15 @@ if (
 		 * minimalized view.
 		 */
 		private function display_cleanup() {
-			add_filter(
-				'tribe_events_recurrence_tooltip', function ( $tooltip ) {
+			add_filter( 'tribe_events_recurrence_tooltip', function ( $tooltip ) {
 				return '';
-			}, 10, 1
-			);
+			}, 10, 1 );
 
-			add_filter(
-				'tribe_get_venue_details', function ( $venue_details ) {
+			add_filter( 'tribe_get_venue_details', function ( $venue_details ) {
 				unset( $venue_details['address'] );
 
 				return $venue_details;
-			}
-			);
+			} );
 		}
 
 		/**
@@ -639,11 +631,9 @@ if (
 		 * TODO
 		 */
 		private function setup_plain_language_redirect() {
-			add_filter(
-				'query_vars', function ( $vars ) {
+			add_filter( 'query_vars', function ( $vars ) {
 				return array_merge( $vars, array( 'eventDateModified' ), array( 'eventWeekModified' ), array( 'eventMonthModified' ) );
-			}, 10, 1
-			);
+			}, 10, 1 );
 
 			$plain_language = array(
 				__( 'events/tomorrow', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventDateModified=1',
@@ -657,19 +647,16 @@ if (
 				__( 'events/month', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventMonthModified=$matches[1]&eventDisplay=month',
 			);
 
-			add_filter(
-				'rewrite_rules_array', function ( $rules ) use ( $plain_language ) {
+			add_filter( 'rewrite_rules_array', function ( $rules ) use ( $plain_language ) {
 				$new_rules = array_merge(
 					$plain_language,
 					$rules
 				);
 
 				return $new_rules;
-			}, 10, 1
-			);
+			}, 10, 1 );
 
-			add_filter(
-				'pre_get_posts', function ( $query ) {
+			add_filter( 'pre_get_posts', function ( $query ) {
 				if ( get_query_var( 'eventDateModified' ) ) {
 					$offset = date( 'Y-m-d', time() + ( DAY_IN_SECONDS * get_query_var( 'eventDateModified' ) ) );
 					$query->set( 'eventDate', $offset );
@@ -686,8 +673,7 @@ if (
 				}
 
 				return $query;
-			}
-			);
+			} );
 		}
 	} // end class
 } // end if class_exists check
