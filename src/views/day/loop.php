@@ -16,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 global $post, $wp_query;
 
 $current_time_slot = null;
-$today            = Tribe__Extension__Schedule_Day_View::instance()->today();
-$class_is_today   = $today ? ' tribe-events-loop-day-today' : ' tribe-events-day-grouping-is-active tribe-events-loop-day-not-today';
+$today             = Tribe__Extension__Schedule_Day_View::instance()->today();
+$class_is_today    = $today ? ' tribe-events-loop-day-today' : ' tribe-events-day-grouping-is-active tribe-events-loop-day-not-today';
 
 $all_day_text = Tribe__Extension__Schedule_Day_View::instance()->get_all_day_text();
 

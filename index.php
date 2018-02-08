@@ -37,7 +37,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	const PREFIX = 'tribe_ext_sch_day_view';
 
 	/**
-	 * Time slot prefix that has itself already been namespaced. Used in WP_Post.
+	 * Time slot name used within each WP_Post.
 	 *
 	 * @see Tribe__Extension__Schedule_Day_View::PREFIX
 	 *
@@ -48,14 +48,16 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * The current time slot's array of arguments. Used in the loop template file per time slot.
+	 * The current time slot's array of arguments. Used in the loop template
+	 * file per time slot.
 	 *
 	 * @var array
 	 */
 	public $current_time_slot_args = array();
 
 	/**
-	 * The list of The Events Calendar's template files to override with which of this plugin's template files.
+	 * The list of The Events Calendar's template files to override with which
+	 * of this plugin's template files.
 	 *
 	 * @return array
 	 */
@@ -69,7 +71,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * Set the minimum version of The Events Calendar and set this extension's URL.
+	 * Set the minimum version of The Events Calendar and this extension's URL.
 	 */
 	public function construct() {
 		// Tribe__Assets::maybe_get_min_file() requires v4.3
@@ -78,7 +80,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * Start doing stuff.
+	 * Extension initialization and hooks.
 	 */
 	public function init() {
 		$this->setup_templates();
@@ -146,7 +148,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * Get the time slots (except for All Day) and the integer hours they include as a multidimensional aray.
+	 * Get the time slots (except for All Day) and the integer hours they
+	 * include as a multidimensional aray.
 	 *
 	 * @see \Tribe__Events__Filterbar__Filters__Time_Of_Day::get_values()
 	 *
@@ -190,7 +193,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * Set day view archive's title to be "Today's Event" if just 1 event, else "Today's Events".
+	 * Set day view archive's title to be "Today's Event" if just 1 event,
+	 * else "Today's Events".
 	 *
 	 * @param $title
 	 *
@@ -219,8 +223,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	/**
 	 * Get the "All Day" text after translation.
 	 *
-	 * Used to compare/determine if we are in the All Day time slot, which is why
-	 * we need to have this as a method instead, to keep things DRY.
+	 * Used to compare/determine if we are in the All Day time slot, which is
+	 * why we need to have this as a method instead, to keep things DRY.
 	 *
 	 * @return string
 	 */
@@ -318,15 +322,15 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
 		$args = array(
 			'is_all_day_time_slot' => $time_slot === $this->get_all_day_text(),
-			'is_active_on_load'   => in_array( $time_slot, $wp_query->active_time_slots ) ? true : false,
+			'is_active_on_load'    => in_array( $time_slot, $wp_query->active_time_slots ) ? true : false,
 		);
 
 		$args['class_group_active_events_on_load'] = $args['is_active_on_load'] ? ' tribe-events-day-grouping-event-is-active' : '';
 		$args['aria_expanded_on_load']             = $args['is_active_on_load'] ? 'true' : 'false';
 		$args['aria_hidden_on_load']               = $args['is_active_on_load'] ? 'false' : 'true';
-		$args['time_slot_id']                       = $this->get_time_slot_id_from_time_slot( $time_slot );
-		$args['time_slot_event_count']              = $this->get_time_slot_event_count( $time_slot );
-		$args['time_slot_title']                    = $this->get_time_slot_title( $time_slot );
+		$args['time_slot_id']                      = $this->get_time_slot_id_from_time_slot( $time_slot );
+		$args['time_slot_event_count']             = $this->get_time_slot_event_count( $time_slot );
+		$args['time_slot_title']                   = $this->get_time_slot_title( $time_slot );
 		$args['button_id']                         = $this->get_button_id_from_time_slot( $time_slot );
 		$args['start_timestamp']                   = $this->get_time_slot_timestamp( $time_slot );
 		$args['end_timestamp']                     = $this->get_time_slot_timestamp( $time_slot, false );
@@ -343,7 +347,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 * @return false|int
 	 */
 	public function get_timestamp( $post_id, $start_end = 'Start' ) {
-		// We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
+		// We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being timezone-dependent instead of always interpreted as being in UTC.
 		$time = sprintf(
 			'%s %s',
 			get_post_meta( $post_id, "_Event{$start_end}Date", true ),
@@ -359,7 +363,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 *
 	 * @param $post_id
 	 *
-	 * @return int|string
+	 * @return string
 	 */
 	private function get_non_all_day_time_slot_name( $post_id ) {
 		$timezone = Tribe__Events__Timezones::wp_timezone_string();
@@ -383,7 +387,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
 		foreach ( $this->get_time_of_day_ranges() as $time_of_day => $hours ) {
 			if ( in_array( $hour, $hours ) ) {
-				return $time_of_day;
+				return (string) $time_of_day;
 			}
 		}
 	}
@@ -417,7 +421,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * Get today's date in the format of 'Y-m-d' (e.g. 2018-03-01).
+	 * Get today's date in the format of 'Y-m-d' (e.g. 2018-03-01 for March 1).
 	 *
 	 * @see \Tribe__Events__Template__Day::header_attributes()
 	 */
@@ -462,19 +466,15 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 * minimalized view.
 	 */
 	private function display_cleanup() {
-		add_filter(
-			'tribe_events_recurrence_tooltip', function ( $tooltip ) {
+		add_filter( 'tribe_events_recurrence_tooltip', function ( $tooltip ) {
 			return '';
-		}, 10, 1
-		);
+		}, 10, 1 );
 
-		add_filter(
-			'tribe_get_venue_details', function ( $venue_details ) {
+		add_filter( 'tribe_get_venue_details', function ( $venue_details ) {
 			unset( $venue_details['address'] );
 
 			return $venue_details;
-		}
-		);
+		} );
 	}
 
 	/**
@@ -601,6 +601,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			$time_slot = str_replace( ' ', '-', $time_slot ); // e.g. All Day becomes All-Day
 
 			return 'tribe-events-day-time-slot-' . esc_attr( $time_slot );
+		} else {
+			return '';
 		}
 	}
 
@@ -618,6 +620,8 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			$time_slot = str_replace( ' ', '-', $time_slot ); // e.g. All Day becomes All-Day
 
 			return 'time-slot-trigger-' . esc_attr( $time_slot );
+		} else {
+			return '';
 		}
 	}
 
@@ -625,11 +629,9 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 * TODO
 	 */
 	private function setup_plain_language_redirect() {
-		add_filter(
-			'query_vars', function ( $vars ) {
+		add_filter( 'query_vars', function ( $vars ) {
 			return array_merge( $vars, array( 'eventDateModified' ), array( 'eventWeekModified' ), array( 'eventMonthModified' ) );
-		}, 10, 1
-		);
+		}, 10, 1 );
 
 		$plain_language = array(
 			__( 'events/tomorrow', 'tribe-ext-schedule-day-view' )                => 'index.php?post_type=tribe_events&eventDateModified=1',
@@ -643,19 +645,16 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			__( 'events/month', 'tribe-ext-schedule-day-view' ) . '/(\-?[0-9])/?' => 'index.php?post_type=tribe_events&eventMonthModified=$matches[1]&eventDisplay=month',
 		);
 
-		add_filter(
-			'rewrite_rules_array', function ( $rules ) use ( $plain_language ) {
+		add_filter( 'rewrite_rules_array', function ( $rules ) use ( $plain_language ) {
 			$new_rules = array_merge(
 				$plain_language,
 				$rules
 			);
 
 			return $new_rules;
-		}, 10, 1
-		);
+		}, 10, 1 );
 
-		add_filter(
-			'pre_get_posts', function ( $query ) {
+		add_filter( 'pre_get_posts', function ( $query ) {
 			if ( get_query_var( 'eventDateModified' ) ) {
 				$offset = date( 'Y-m-d', time() + ( DAY_IN_SECONDS * get_query_var( 'eventDateModified' ) ) );
 				$query->set( 'eventDate', $offset );
@@ -672,8 +671,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			}
 
 			return $query;
-		}
-		);
+		} );
 	}
 
 }
