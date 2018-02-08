@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 global $post, $wp_query;
 
-$current_timeslot = null;
+$current_time_slot = null;
 $today            = Tribe__Extension__Schedule_Day_View::instance()->today();
 $class_is_today   = $today ? ' tribe-events-loop-day-today' : ' tribe-events-day-grouping-is-active tribe-events-loop-day-not-today';
 
@@ -34,37 +34,36 @@ $now = Tribe__Extension__Schedule_Day_View::instance()->now_timestamp();
 	<?php
 	// Used by Tribe__Extension__Schedule_Day_View::setup_loop()
 	do_action( 'tribe_ext_sch_day_inside_before_loop' );
-	$all_timeslots = array_merge( array( $all_day_text ), array_keys( $wp_query->get( 'timeslots' ) ) );
+	$all_time_slots = array_merge( array( $all_day_text ), array_keys( $wp_query->get( 'time_slots' ) ) );
 
-	foreach ( $all_timeslots as $current_timeslot ) :
-		// Used by Tribe__Extension__Schedule_Day_View::process_a_timeslot()
-		Tribe__Extension__Schedule_Day_View::instance()->build_current_timeslot_args( $current_timeslot );
-		$current_timeslot_args = Tribe__Extension__Schedule_Day_View::instance()->current_timeslot_args;
+	foreach ( $all_time_slots as $current_time_slot ) :
+		Tribe__Extension__Schedule_Day_View::instance()->build_current_time_slot_args( $current_time_slot );
+		$current_time_slot_args = Tribe__Extension__Schedule_Day_View::instance()->current_time_slot_args;
 
 		$active_class = '';
 		if ( $today ) {
 			if (
-				$current_timeslot_args['is_all_day_timeslot']
+				$current_time_slot_args['is_all_day_time_slot']
 				|| (
-					$now >= $current_timeslot_args['start_timestamp']
-					&& $now <= $current_timeslot_args['end_timestamp']
+					$now >= $current_time_slot_args['start_timestamp']
+					&& $now <= $current_time_slot_args['end_timestamp']
 				)
 			) {
 				$active_class = ' tribe-events-day-grouping-is-active tribe-events-day-grouping-is-now';
 			}
-		} elseif ( ! empty( $current_timeslot_args['timeslot_event_count'] ) ) {
+		} elseif ( ! empty( $current_time_slot_args['time_slot_event_count'] ) ) {
 			$active_class = ' tribe-events-day-grouping-is-active';
 		}
 		?>
 
 		<div
-			id="<?php echo esc_attr( $current_timeslot_args['timeslot_id'] ); ?>"
+			id="<?php echo esc_attr( $current_time_slot_args['time_slot_id'] ); ?>"
 			class="tribe-events-day-time-slot<?php echo esc_attr( $active_class ); ?>"
-			data-tribe-groupstart="<?php echo esc_attr( $current_timeslot_args['start_timestamp'] ); ?>"
-			data-tribe-groupend="<?php echo esc_attr( $current_timeslot_args['end_timestamp'] ); ?>"
-			data-tribe-groupeventscount="<?php echo esc_attr( $current_timeslot_args['timeslot_event_count'] ); ?>"
+			data-tribe-groupstart="<?php echo esc_attr( $current_time_slot_args['start_timestamp'] ); ?>"
+			data-tribe-groupend="<?php echo esc_attr( $current_time_slot_args['end_timestamp'] ); ?>"
+			data-tribe-groupeventscount="<?php echo esc_attr( $current_time_slot_args['time_slot_event_count'] ); ?>"
 			<?php
-			if ( ! empty( $current_timeslot_args['timeslot_event_count'] ) ) {
+			if ( ! empty( $current_time_slot_args['time_slot_event_count'] ) ) {
 				echo 'data-tribe-grouphasevents';
 			} else {
 				echo 'data-tribe-grouphasnoevents';
@@ -73,18 +72,18 @@ $now = Tribe__Extension__Schedule_Day_View::instance()->now_timestamp();
 		>
 			<h5>
 				<button
-					id="<?php echo esc_attr( $current_timeslot_args['button_id'] ); ?>"
+					id="<?php echo esc_attr( $current_time_slot_args['button_id'] ); ?>"
 					class="tribe-events-day-group-trigger"
-					aria-expanded="<?php echo esc_attr( $current_timeslot_args['aria_expanded_on_load'] ); ?>"
+					aria-expanded="<?php echo esc_attr( $current_time_slot_args['aria_expanded_on_load'] ); ?>"
 					<?php
-					if ( empty( $current_timeslot_args['timeslot_event_count'] ) ) {
+					if ( empty( $current_time_slot_args['time_slot_event_count'] ) ) {
 						echo 'disabled';
 					}
 					?>
 				>
-					<?php echo esc_html( $current_timeslot_args['timeslot_title'] ); ?>
+					<?php echo esc_html( $current_time_slot_args['time_slot_title'] ); ?>
 					<?php
-					if ( ! empty( $current_timeslot_args['timeslot_event_count'] ) ) {
+					if ( ! empty( $current_time_slot_args['time_slot_event_count'] ) ) {
 						printf( '<span>%s</span>', esc_html__( "Toggle Group's Events", 'tribe-ext-schedule-day-view' ) );
 					}
 					?>
@@ -93,8 +92,8 @@ $now = Tribe__Extension__Schedule_Day_View::instance()->now_timestamp();
 			<?php
 			while ( have_posts() ) : the_post();
 
-				$timeslot_name = Tribe__Extension__Schedule_Day_View::instance()->timeslot_name();
-				if ( $current_timeslot === $post->$timeslot_name ) {
+				$time_slot_name = Tribe__Extension__Schedule_Day_View::instance()->time_slot_name();
+				if ( $current_time_slot === $post->$time_slot_name ) {
 					tribe_get_template_part( 'day/single' );
 				}
 

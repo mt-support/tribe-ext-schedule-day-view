@@ -24,13 +24,13 @@ $has_venue = $venue_details ? ' vcard' : '';
 // no address, so let's get the address string on its own for a couple of checks below.
 $venue_address = tribe_get_address();
 
-$current_timeslot_args = Tribe__Extension__Schedule_Day_View::instance()->current_timeslot_args;
+$current_time_slot_args = Tribe__Extension__Schedule_Day_View::instance()->current_time_slot_args;
 ?>
 <div
 	id="post-<?php echo esc_attr( get_the_ID() ); ?>"
-	class="<?php tribe_events_event_classes( $post->ID ); ?> post-tribe-events-day-group-event <?php echo esc_attr( $current_timeslot_args['class_group_active_events_on_load'] ); ?>"
-	aria-hidden="<?php echo esc_attr( $current_timeslot_args['aria_hidden_on_load'] ); ?>"
-	aria-labelledby="<?php echo esc_attr( $current_timeslot_args['button_id'] ); ?>"
+	class="<?php tribe_events_event_classes( $post->ID ); ?> post-tribe-events-day-group-event <?php echo esc_attr( $current_time_slot_args['class_group_active_events_on_load'] ); ?>"
+	aria-hidden="<?php echo esc_attr( $current_time_slot_args['aria_hidden_on_load'] ); ?>"
+	aria-labelledby="<?php echo esc_attr( $current_time_slot_args['button_id'] ); ?>"
 	data-tribe-group-event-start="<?php
 	// We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
 	$start = sprintf(

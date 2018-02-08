@@ -31,14 +31,34 @@ if ( ! class_exists( 'Tribe__Extension' ) ) {
  */
 class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 
+	/**
+	 * The prefix used for settings or whatever else needs to be namespaced.
+	 */
 	const PREFIX = 'tribe_ext_sch_day_view';
 
-	public $current_timeslot_args = array();
-
-	public function timeslot_name() {
-		return self::PREFIX . '_timeslot';
+	/**
+	 * Time slot prefix that has itself already been namespaced. Used in WP_Post.
+	 *
+	 * @see Tribe__Extension__Schedule_Day_View::PREFIX
+	 *
+	 * @return string
+	 */
+	public function time_slot_name() {
+		return self::PREFIX . '_time_slot';
 	}
 
+	/**
+	 * The current time slot's array of arguments. Used in the loop template file per time slot.
+	 *
+	 * @var array
+	 */
+	public $current_time_slot_args = array();
+
+	/**
+	 * The list of The Events Calendar's template files to override with which of this plugin's template files.
+	 *
+	 * @return array
+	 */
 	private function templates() {
 		return array(
 			'day/single.php'          => 'src/views/day/single.php',
@@ -48,32 +68,32 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		);
 	}
 
-
+	/**
+	 * Set the minimum version of The Events Calendar and set this extension's URL.
+	 */
 	public function construct() {
 		// Tribe__Assets::maybe_get_min_file() requires v4.3
 		$this->add_required_plugin( 'Tribe__Events__Main', '4.3' );
 		$this->set_url( 'https://theeventscalendar.com/extensions/schedule-day-view/' );
 	}
 
+	/**
+	 * Start doing stuff.
+	 */
 	public function init() {
 		$this->setup_templates();
 		$this->setup_loop();
 		$this->display_cleanup();
 		add_action( 'init', array( $this, 'register_assets' ) );
 
-		// Load assets for main archive Day View
+		// Load assets for main day view archive
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
-		// Load assets for PRO shortcode
-		add_action(
-			'tribe_events_pro_tribe_events_shortcode_prepare_day', array(
-				$this,
-				'load_assets_in_day_view_shortcode',
-			)
-		);
+		// Load assets for PRO shortcode's day view
+		add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'load_assets_in_day_view_shortcode' ) );
 
 		add_filter( 'tribe_get_events_title', array( $this, 'set_todays_day_view_title' ) );
 
-		$this->setup_plain_language_redirect();
+		$this->setup_plain_language_redirect(); // TODO
 	}
 
 	/**
@@ -81,17 +101,15 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	 */
 	private function setup_templates() {
 		foreach ( $this->templates() as $template => $new_template ) {
-			add_filter(
-				'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
+			add_filter( 'tribe_get_template_part_path_' . $template, function ( $file, $slug, $name ) use ( $new_template ) {
 				// Return the path for our file.
 				return plugin_dir_path( __FILE__ ) . $new_template;
-			}, 10, 3
-			);
+			}, 10, 3 );
 		}
 	}
 
 	/**
-	 * Load this view's assets.
+	 * Register this view's assets.
 	 */
 	public function register_assets() {
 		$resources_url = trailingslashit( plugin_dir_url( __FILE__ ) ) . 'src/resources/';
@@ -110,7 +128,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * Load this view's assets in Day archive view.
+	 * Load this view's assets in day view archive.
 	 */
 	public function load_assets_in_day_view_archive() {
 		if ( tribe_is_day() ) {
@@ -120,7 +138,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * Load this view's assets in Day shortcode view.
+	 * Load this view's assets in day view shortcode.
 	 */
 	public function load_assets_in_day_view_shortcode() {
 		wp_enqueue_style( self::PREFIX );
@@ -128,7 +146,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
-	 * Get the times of day as an array.
+	 * Get the time slots (except for All Day) and the integer hours they include as a multidimensional aray.
 	 *
 	 * @see \Tribe__Events__Filterbar__Filters__Time_Of_Day::get_values()
 	 *
@@ -161,16 +179,23 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 				21,
 				22,
 				23,
-				0,
-				1,
-				2,
-				3,
-				4,
-				5,
+				0, // midnight the next day
+				1, // 1am the next day
+				2, // 2am the next day
+				3, // 3am the next day
+				4, // 4am the next day
+				5, // 5am the next day
 			),
 		);
 	}
 
+	/**
+	 * Set day view archive's title to be "Today's Event" if just 1 event, else "Today's Events".
+	 *
+	 * @param $title
+	 *
+	 * @return string
+	 */
 	public function set_todays_day_view_title( $title ) {
 		global $wp_query;
 
@@ -191,24 +216,46 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return $title;
 	}
 
+	/**
+	 * Get the "All Day" text after translation.
+	 *
+	 * Used to compare/determine if we are in the All Day time slot, which is why
+	 * we need to have this as a method instead, to keep things DRY.
+	 *
+	 * @return string
+	 */
 	public function get_all_day_text() {
 		return esc_html__( 'All Day', 'tribe-ext-schedule-day-view' );
 	}
 
-	private function get_timeslot_event_count( $timeslot ) {
+	/**
+	 * Get the number of events within a given time slot.
+	 *
+	 * @param $time_slot
+	 *
+	 * @return int
+	 */
+	private function get_time_slot_event_count( $time_slot ) {
 		global $wp_query;
 
-		if ( empty( $wp_query->timeslot_counts[$timeslot] ) ) {
+		if ( empty( $wp_query->time_slot_counts[$time_slot] ) ) {
 			$event_count = 0;
 		} else {
-			$event_count = $wp_query->timeslot_counts[$timeslot];
+			$event_count = $wp_query->time_slot_counts[$time_slot];
 		}
 
 		return absint( $event_count );
 	}
 
-	private function get_timeslot_title( $timeslot ) {
-		$event_count = $this->get_timeslot_event_count( $timeslot );
+	/**
+	 * Get the title of a given time slot.
+	 *
+	 * @param $time_slot
+	 *
+	 * @return string
+	 */
+	private function get_time_slot_title( $time_slot ) {
+		$event_count = $this->get_time_slot_event_count( $time_slot );
 
 		if ( 0 === $event_count ) {
 			$event_count_text = sprintf( __( '(No %s)', 'tribe-ext-schedule-day-view' ), tribe_get_event_label_plural() );
@@ -218,67 +265,83 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 			$event_count_text = sprintf( __( '(%d %s)', 'tribe-ext-schedule-day-view' ), $event_count, tribe_get_event_label_plural() );
 		}
 
-		return sprintf( esc_html__( '%s %s', 'tribe-ext-schedule-day-view' ), $timeslot, $event_count_text );
+		return sprintf( esc_html__( '%s %s', 'tribe-ext-schedule-day-view' ), $time_slot, $event_count_text );
 	}
 
+	/**
+	 * Sets up each time slot and its data and adds it to $wp_query.
+	 *
+	 * Runs on the initial action hook in the src/views/day/loop.php template.
+	 */
 	private function setup_loop() {
-		add_action(
-			'tribe_ext_sch_day_inside_before_loop', function () {
+		add_action( 'tribe_ext_sch_day_inside_before_loop', function () {
 			global $wp_query;
 
-			$wp_query->set( 'timeslots', $this->get_js_timeslots() );
+			$wp_query->set( 'time_slots', $this->get_time_slots_array_of_timestamp_ranges() );
 
-			$timeslot_name = $this->timeslot_name();
+			$time_slot_name = $this->time_slot_name();
 
-			$all_timeslots    = array();
-			$active_timeslots = array();
+			$all_time_slots    = array();
+			$active_time_slots = array();
 
 			foreach ( $wp_query->posts as &$post ) {
 				if ( tribe_event_is_all_day( $post->ID ) ) {
-					$post->$timeslot_name = $this->get_all_day_text();
+					$post->$time_slot_name = $this->get_all_day_text();
 				} else {
-					$post->$timeslot_name = $this->get_non_all_day_timeslot_name( $post->ID );
+					$post->$time_slot_name = $this->get_non_all_day_time_slot_name( $post->ID );
 				}
 
-				$all_timeslots[] = $post->$timeslot_name;
+				$all_time_slots[] = $post->$time_slot_name;
 
 				$post->is_active_on_load = $this->active( $post );
 
 				if ( $post->is_active_on_load ) {
-					$active_timeslots[] = $post->$timeslot_name;
+					$active_time_slots[] = $post->$time_slot_name;
 				}
 			}
 
-			$wp_query->timeslot_counts = array_count_values( $all_timeslots );
+			$wp_query->time_slot_counts = array_count_values( $all_time_slots );
 
-			$wp_query->active_timeslots = array_unique( $active_timeslots );
+			$wp_query->active_time_slots = array_unique( $active_time_slots );
 
 			$wp_query->rewind_posts();
-		}
-		);
+		} );
 	}
 
-	public function build_current_timeslot_args( $timeslot ) {
+	/**
+	 * Build the data for a given time slot.
+	 *
+	 * @param $time_slot
+	 */
+	public function build_current_time_slot_args( $time_slot ) {
 		global $wp_query;
 
 		$args = array(
-			'is_all_day_timeslot' => $timeslot === $this->get_all_day_text(),
-			'is_active_on_load'   => in_array( $timeslot, $wp_query->active_timeslots ) ? true : false,
+			'is_all_day_time_slot' => $time_slot === $this->get_all_day_text(),
+			'is_active_on_load'   => in_array( $time_slot, $wp_query->active_time_slots ) ? true : false,
 		);
 
 		$args['class_group_active_events_on_load'] = $args['is_active_on_load'] ? ' tribe-events-day-grouping-event-is-active' : '';
 		$args['aria_expanded_on_load']             = $args['is_active_on_load'] ? 'true' : 'false';
 		$args['aria_hidden_on_load']               = $args['is_active_on_load'] ? 'false' : 'true';
-		$args['timeslot_id']                       = $this->get_timeslot_id_from_timeslot( $timeslot );
-		$args['timeslot_event_count']              = $this->get_timeslot_event_count( $timeslot );
-		$args['timeslot_title']                    = $this->get_timeslot_title( $timeslot );
-		$args['button_id']                         = $this->get_button_id_from_timeslot( $timeslot );
-		$args['start_timestamp']                   = $this->get_timeslot_timestamp( $timeslot );
-		$args['end_timestamp']                     = $this->get_timeslot_timestamp( $timeslot, false );
+		$args['time_slot_id']                       = $this->get_time_slot_id_from_time_slot( $time_slot );
+		$args['time_slot_event_count']              = $this->get_time_slot_event_count( $time_slot );
+		$args['time_slot_title']                    = $this->get_time_slot_title( $time_slot );
+		$args['button_id']                         = $this->get_button_id_from_time_slot( $time_slot );
+		$args['start_timestamp']                   = $this->get_time_slot_timestamp( $time_slot );
+		$args['end_timestamp']                     = $this->get_time_slot_timestamp( $time_slot, false );
 
-		$this->current_timeslot_args = $args;
+		$this->current_time_slot_args = $args;
 	}
 
+	/**
+	 * Get an event's start or end timestamp.
+	 *
+	 * @param        $post_id
+	 * @param string $start_end
+	 *
+	 * @return false|int
+	 */
 	public function get_timestamp( $post_id, $start_end = 'Start' ) {
 		// We do it this way until \Tribe__Events__Timezones::event_start_timestamp() and end methods actually work by being TZ dependent instead of always interpreted as being in UTC
 		$time = sprintf(
@@ -290,7 +353,15 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return strtotime( $time );
 	}
 
-	private function get_non_all_day_timeslot_name( $post_id ) {
+	/**
+	 * Get the front-end time slot name of a given time slot (does not work for
+	 * All Day time slot).
+	 *
+	 * @param $post_id
+	 *
+	 * @return int|string
+	 */
+	private function get_non_all_day_time_slot_name( $post_id ) {
 		$timezone = Tribe__Events__Timezones::wp_timezone_string();
 
 		$existing_timezone = date_default_timezone_get(); // will fallback to UTC but may also return a TZ environment variable (e.g. EST)
@@ -317,6 +388,11 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		}
 	}
 
+	/**
+	 * Get the timestamp of "right now" in the timezone from WordPress settings.
+	 *
+	 * @return int
+	 */
 	public static function now_timestamp() {
 		$timezone = Tribe__Events__Timezones::wp_timezone_string();
 
@@ -341,6 +417,7 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 	}
 
 	/**
+	 * Get today's date in the format of 'Y-m-d' (e.g. 2018-03-01).
 	 *
 	 * @see \Tribe__Events__Template__Day::header_attributes()
 	 */
@@ -367,35 +444,6 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return $today_ymd;
 	}
 
-	public function get_js_timeslots() {
-		$today_ymd = $this->get_today_ymd();
-
-		$timeslot_timestamps = array();
-
-		foreach ( $this->get_time_of_day_ranges() as $time_of_day => $hours ) {
-			$start_hour = $hours[0];
-			if ( 6 > $start_hour ) {
-				$start_hour = 24 + 6;
-			}
-			$start_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $start_hour );
-
-			$end_hour = end( $hours );
-			reset( $hours );
-			if ( 6 > $end_hour ) {
-				$end_hour = 24 + 6;
-			}
-			$end_hour        += 1; // We actually need the start hour of the next range
-			$end_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $end_hour );
-
-			$timeslot_timestamps[$time_of_day] = array(
-				'start' => strtotime( $start_hour_string ),
-				'end'   => strtotime( $end_hour_string ) - 1, // one second less than the start hour of the next range
-			);
-		}
-
-		return $timeslot_timestamps;
-	}
-
 	/**
 	 * Determine if an event is a featured event.
 	 *
@@ -409,6 +457,10 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return (bool) tribe( 'tec.featured_events' )->is_featured( $post->ID );
 	}
 
+	/**
+	 * Remove additional information we do not want to display in this
+	 * minimalized view.
+	 */
 	private function display_cleanup() {
 		add_filter(
 			'tribe_events_recurrence_tooltip', function ( $tooltip ) {
@@ -425,6 +477,11 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		);
 	}
 
+	/**
+	 * Determine if the day view is currently rendering today's events.
+	 *
+	 * @return bool
+	 */
 	public function today() {
 		global $wp_query;
 
@@ -435,23 +492,32 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		}
 	}
 
-	// to only be used in the loop
-	public function active( $post ) {
-		$timeslot_name = $this->timeslot_name();
+	/**
+	 * Determine if an event is within an "active" (All Day or Right Now) time
+	 * slot.
+	 *
+	 * This method is to only be used within the loop.
+	 *
+	 * @param WP_Post $post
+	 *
+	 * @return bool
+	 */
+	public function active( WP_Post $post ) {
+		$time_slot_name = $this->time_slot_name();
 
 		if ( ! $this->today() ) {
 			return true;
 		}
 
-		if ( $this->get_all_day_text() === $post->$timeslot_name ) {
+		if ( $this->get_all_day_text() === $post->$time_slot_name ) {
 			return true;
 		}
 
 		$now = time();
 
 		if (
-			$now >= $this->get_timeslot_timestamp( $post->$timeslot_name )
-			&& $now <= $this->get_timeslot_timestamp( $post->$timeslot_name, false )
+			$now >= $this->get_time_slot_timestamp( $post->$time_slot_name )
+			&& $now <= $this->get_time_slot_timestamp( $post->$time_slot_name, false )
 		) {
 			return true;
 		}
@@ -459,39 +525,105 @@ class Tribe__Extension__Schedule_Day_View extends Tribe__Extension {
 		return false;
 	}
 
-	public function get_timeslot_timestamp( $timeslot = '', $start = true ) {
+	/**
+	 * Build the array of time slots and their start and end timestamps.
+	 *
+	 * The end of one time slot is 1 second less than the start of the next
+	 * time slot.
+	 *
+	 * @return array
+	 */
+	public function get_time_slots_array_of_timestamp_ranges() {
+		$today_ymd = $this->get_today_ymd();
+
+		$time_slot_timestamps = array();
+
+		foreach ( $this->get_time_of_day_ranges() as $time_of_day => $hours ) {
+			$start_hour = $hours[0];
+			if ( 6 > $start_hour ) {
+				$start_hour = 24 + 6;
+			}
+			$start_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $start_hour );
+
+			$end_hour = end( $hours );
+			reset( $hours );
+			if ( 6 > $end_hour ) {
+				$end_hour = 24 + 6;
+			}
+			$end_hour        += 1; // We actually need the start hour of the next range
+			$end_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $end_hour );
+
+			$time_slot_timestamps[$time_of_day] = array(
+				'start' => strtotime( $start_hour_string ),
+				'end'   => strtotime( $end_hour_string ) - 1, // one second less than the start hour of the next range
+			);
+		}
+
+		return $time_slot_timestamps;
+	}
+
+	/**
+	 * Get the start or end timestamp of a given time slot.
+	 *
+	 * @param string $time_slot
+	 * @param bool   $start
+	 *
+	 * @return string
+	 */
+	public function get_time_slot_timestamp( $time_slot = '', $start = true ) {
 		global $wp_query;
 
 		if (
-			empty( $timeslot )
-			|| $this->get_all_day_text() === $timeslot
+			empty( $time_slot )
+			|| $this->get_all_day_text() === $time_slot
 		) {
 			return '';
 		}
 
 		if ( $start ) {
-			return $wp_query->get( 'timeslots' )[$timeslot]['start'];
+			return $wp_query->get( 'time_slots' )[$time_slot]['start'];
 		} else {
-			return $wp_query->get( 'timeslots' )[$timeslot]['end'];
+			return $wp_query->get( 'time_slots' )[$time_slot]['end'];
 		}
 	}
 
-	private function get_timeslot_id_from_timeslot( $timeslot = '' ) {
-		if ( ! empty( $timeslot ) ) {
-			$timeslot = str_replace( ' ', '-', $timeslot ); // e.g. All Day becomes All-Day
+	/**
+	 * Get the div ID of a given time slot.
+	 *
+	 * This is for best practices but is not used for JS or CSS targeting.
+	 *
+	 * @param string $time_slot
+	 *
+	 * @return string
+	 */
+	private function get_time_slot_id_from_time_slot( $time_slot = '' ) {
+		if ( ! empty( $time_slot ) ) {
+			$time_slot = str_replace( ' ', '-', $time_slot ); // e.g. All Day becomes All-Day
 
-			return 'tribe-events-day-time-slot-' . esc_attr( $timeslot );
+			return 'tribe-events-day-time-slot-' . esc_attr( $time_slot );
 		}
 	}
 
-	private function get_button_id_from_timeslot( $timeslot = '' ) {
-		if ( ! empty( $timeslot ) ) {
-			$timeslot = str_replace( ' ', '-', $timeslot ); // e.g. All Day becomes All-Day
+	/**
+	 * Get the button ID of a given time slot.
+	 *
+	 * This is for best practices but is not used for JS or CSS targeting.
+	 *
+	 * @param string $time_slot
+	 *
+	 * @return string
+	 */
+	private function get_button_id_from_time_slot( $time_slot = '' ) {
+		if ( ! empty( $time_slot ) ) {
+			$time_slot = str_replace( ' ', '-', $time_slot ); // e.g. All Day becomes All-Day
 
-			return 'timeslot-trigger-' . esc_attr( $timeslot );
+			return 'time-slot-trigger-' . esc_attr( $time_slot );
 		}
 	}
 
+	/**
+	 * TODO
+	 */
 	private function setup_plain_language_redirect() {
 		add_filter(
 			'query_vars', function ( $vars ) {
