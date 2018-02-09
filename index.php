@@ -548,7 +548,7 @@ if (
 				$end_hour = end( $hours );
 				reset( $hours );
 				if ( 6 > $end_hour ) {
-					$end_hour = 24 + 6;
+					$end_hour = 24 + 5;
 				}
 				$end_hour        += 1; // We actually need the start hour of the next range
 				$end_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $end_hour );
