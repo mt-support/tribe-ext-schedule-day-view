@@ -149,7 +149,11 @@ if (
 
 		/**
 		 * Get the time slots (except for All Day) and the integer hours they
-		 * include as a multidimensional aray.
+		 * include as a multidimensional array.
+		 *
+		 * Note that the hours do not exactly match the *setup* of the Time of
+		 * Day filter's get_values(), but this is setup in a way to match its
+		 * actual *results* when using this filter.
 		 *
 		 * @see \Tribe__Events__Filterbar__Filters__Time_Of_Day::get_values()
 		 *
@@ -158,6 +162,12 @@ if (
 		protected function get_time_of_day_ranges() {
 			return array(
 				__( 'Morning', 'tribe-ext-schedule-day-view' )   => array(
+					0,
+					1,
+					2,
+					3,
+					4,
+					5,
 					6,
 					7,
 					8,
@@ -182,12 +192,6 @@ if (
 					21,
 					22,
 					23,
-					0, // midnight the next day
-					1, // 1am the next day
-					2, // 2am the next day
-					3, // 3am the next day
-					4, // 4am the next day
-					5, // 5am the next day
 				),
 			);
 		}
@@ -304,7 +308,11 @@ if (
 					}
 				}
 
+				$all_time_slots = array_filter( $all_time_slots );
+
 				$wp_query->time_slot_counts = array_count_values( $all_time_slots );
+
+				$active_time_slots = array_filter( $active_time_slots );
 
 				$wp_query->active_time_slots = array_unique( $active_time_slots );
 
@@ -366,6 +374,8 @@ if (
 		 * @return string
 		 */
 		private function get_non_all_day_time_slot_name( $post_id ) {
+			global $wp_query;
+
 			$timezone = Tribe__Events__Timezones::wp_timezone_string();
 
 			$existing_timezone = date_default_timezone_get(); // will fallback to UTC but may also return a TZ environment variable (e.g. EST)
@@ -380,10 +390,20 @@ if (
 
 			date_default_timezone_set( $timezone );
 
-			$hour = date_i18n( 'G', $this->get_timestamp( $post_id ) );
+			$event_start_timestamp = $this->get_timestamp( $post_id );
 
-			// set back to what date_default_timezone_get() was
-			date_default_timezone_set( $existing_timezone );
+			// Bail if an event is a carry-over from the previous day, such as Yesterday from 10pm - Today 2am, in which case we do not want to return "22" for 10pm even though this event is normally included in Today's Day View results. Note it will still show up in $wp_query, just not in the template's rendering. Possibly override TEC's query to change it "at the source", such as using post__not_in, but beware that you should not exclude multi-day *all day* events.
+			if ( $wp_query->get( 'eventDate' ) !== date( 'Y-m-d', $event_start_timestamp ) ) {
+				// set back to what date_default_timezone_get() was
+				date_default_timezone_set( $existing_timezone );
+
+				return '';
+			} else {
+				$hour = date( 'G', $event_start_timestamp );
+
+				// set back to what date_default_timezone_get() was
+				date_default_timezone_set( $existing_timezone );
+			}
 
 			foreach ( $this->get_time_of_day_ranges() as $time_of_day => $hours ) {
 				if ( in_array( $hour, $hours ) ) {
@@ -394,6 +414,8 @@ if (
 
 		/**
 		 * Get the timestamp of "right now" in the timezone from WordPress settings.
+		 *
+		 * Note: `current_time( 'timestamp' )` does not work for our purposes.
 		 *
 		 * @return int
 		 */
