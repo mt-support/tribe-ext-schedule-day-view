@@ -103,6 +103,7 @@ if (
 			$this->setup_templates();
 			$this->setup_loop();
 			$this->display_cleanup();
+			add_action( 'posts_results', array( $this, 'remove_events_that_started_prev_day' ), 50 );
 			add_action( 'init', array( $this, 'register_assets' ) );
 
 			// Load assets for main day view archive
@@ -261,10 +262,10 @@ if (
 		private function get_time_slot_event_count( $time_slot ) {
 			global $wp_query;
 
-			if ( empty( $wp_query->time_slot_counts[$time_slot] ) ) {
+			if ( empty( $wp_query->time_slot_counts[ $time_slot ] ) ) {
 				$event_count = 0;
 			} else {
-				$event_count = $wp_query->time_slot_counts[$time_slot];
+				$event_count = $wp_query->time_slot_counts[ $time_slot ];
 			}
 
 			return absint( $event_count );
@@ -297,7 +298,7 @@ if (
 		 * Runs on the initial action hook in the src/views/day/loop.php template.
 		 */
 		private function setup_loop() {
-			add_action( 'tribe_ext_sch_day_inside_before_loop', function() {
+			add_action( 'tribe_ext_sch_day_inside_before_loop', function () {
 				global $wp_query;
 
 				$wp_query->set( 'time_slots', $this->get_time_slots_array_of_timestamp_ranges() );
@@ -590,9 +591,10 @@ if (
 				$end_hour        += 1; // We actually need the start hour of the next range
 				$end_hour_string = sprintf( '%s %s +%d hours', $today_ymd, Tribe__Events__Timezones::wp_timezone_string(), $end_hour );
 
-				$time_slot_timestamps[$time_of_day] = array(
+				$time_slot_timestamps[ $time_of_day ] = array(
 					'start' => strtotime( $start_hour_string ),
-					'end'   => strtotime( $end_hour_string ) - 1, // one second less than the start hour of the next range
+					'end'   => strtotime( $end_hour_string ) - 1,
+					// one second less than the start hour of the next range
 				);
 			}
 
@@ -618,10 +620,68 @@ if (
 			}
 
 			if ( $start ) {
-				return $wp_query->get( 'time_slots' )[$time_slot]['start'];
+				return $wp_query->get( 'time_slots' )[ $time_slot ]['start'];
 			} else {
-				return $wp_query->get( 'time_slots' )[$time_slot]['end'];
+				return $wp_query->get( 'time_slots' )[ $time_slot ]['end'];
 			}
+		}
+
+		/**
+		 * Remove yesterday's carried-forward events (e.g. 10pm yesterday to 2am
+		 * today) from today's results.
+		 *
+		 * We have to do it this way to trigger displaying the No Events Found
+		 * notice instead of all time blocks just being empty (unexpected UX).
+		 * Note the use of `suppress_filters` to avoid causing an infinite loop
+		 * since we are already within the `posts_results` filter hook.
+		 *
+		 * @param $posts
+		 *
+		 * @return array
+		 */
+		public function remove_events_that_started_prev_day( $posts ) {
+			if ( ! tribe_is_day() ) {
+				return $posts;
+			}
+
+			$day_view_ymd = get_query_var( 'eventDate' );
+
+			$prev_day_ymd = tribe_get_previous_day_date( $day_view_ymd );
+
+			$events_that_started_prev_day = tribe_get_events( array(
+				'fields'           => 'ids',
+				'numberposts'      => - 1,
+				'posts_per_page'   => - 1,
+				'order'            => 'ASC',
+				'orderby'          => 'ID',
+				'eventDisplay'     => 'custom',
+				'start_date'       => $prev_day_ymd,
+				'end_date'         => $day_view_ymd,
+				'suppress_filters' => true,
+			) );
+
+			if (
+				! is_array( $events_that_started_prev_day )
+				|| empty( $events_that_started_prev_day )
+			) {
+				return $posts;
+			}
+
+			$posts_ids = wp_list_pluck( $posts, 'ID' );
+
+			$posts = tribe_get_events( array(
+				'numberposts'         => - 1,
+				'posts_per_page'      => - 1,
+				'order'               => 'ASC',
+				'orderby'             => 'ID',
+				'eventDisplay'        => 'custom',
+				'post__in'            => $posts_ids,
+				'post__not_in'        => $events_that_started_prev_day,
+				'ignore_sticky_posts' => true,
+				'suppress_filters'    => true,
+			) );
+
+			return $posts;
 		}
 
 		/**
