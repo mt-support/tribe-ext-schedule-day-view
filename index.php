@@ -85,6 +85,21 @@ if (
 		 * Extension initialization and hooks.
 		 */
 		public function init() {
+			// Require PHP 5.4+ because of Closures and Short Array Syntax
+			if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
+				$message = '<p>' . $this->get_name();
+
+				$message .= __( ' requires PHP 5.4 or newer to work. Please contact your website host and inquire about updating PHP.', 'tribe-extension' );
+
+				$message .= sprintf( ' <a href="%1$s">%1$s</a>', 'https://wordpress.org/about/requirements/' );
+
+				$message .= '</p>';
+
+				tribe_notice( $this->get_name(), $message, 'type=error' );
+
+				return;
+			}
+
 			$this->setup_templates();
 			$this->setup_loop();
 			$this->display_cleanup();
