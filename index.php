@@ -103,7 +103,6 @@ if (
 			$this->setup_templates();
 			$this->setup_loop();
 			$this->display_cleanup();
-			add_action( 'posts_results', array( $this, 'remove_events_that_started_prev_day' ), 50 );
 			add_action( 'init', array( $this, 'register_assets' ) );
 
 			// Load assets for main day view archive
@@ -178,6 +177,7 @@ if (
 		protected function get_time_of_day_ranges() {
 			return array(
 				__( 'Morning', 'tribe-ext-schedule-day-view' )   => array(
+					-1, // manually set for events with a start time prior to this day
 					0,
 					1,
 					2,
@@ -382,16 +382,26 @@ if (
 		}
 
 		/**
-		 * Get the front-end time slot name of a given time slot (does not work for
-		 * All Day time slot).
+		 * Get the front-end time slot name of a given time slot for events
+		 * without the "All Day" box checked (i.e. start and end times are set).
+		 *
+		 * If an event started a previous day (yesterday or prior) but is still
+		 * happening ("has not yet ended", nothing to do with recurrence):
+		 * A) Make it appear as an All Day event if its end time is beyond today
+		 * B) Or make its hour = -1 (not a real hour number), which will show up
+		 * in the Morning time slot
+		 * C) Else get the hour number (e.g. `23` for 11pm)
+		 * Most events will fall into the "C" scenario.
+		 * If an event falls into scenario "A" or "B", its WP_Post
+		 * `$post->timeslot` (from TEC's Day View) will actually be the
+		 * translated "Ongoing" text, set from
+		 * Tribe__Events__Template__Day::setup_view().
 		 *
 		 * @param $post_id
 		 *
 		 * @return string
 		 */
 		private function get_non_all_day_time_slot_name( $post_id ) {
-			global $wp_query;
-
 			$timezone = Tribe__Events__Timezones::wp_timezone_string();
 
 			$existing_timezone = date_default_timezone_get(); // will fallback to UTC but may also return a TZ environment variable (e.g. EST)
@@ -407,19 +417,25 @@ if (
 			date_default_timezone_set( $timezone );
 
 			$event_start_timestamp = $this->get_timestamp( $post_id );
+			$event_end_timestamp   = $this->get_timestamp( $post_id, 'End' );
 
-			// Bail if an event is a carry-over from the previous day, such as Yesterday from 10pm - Today 2am, in which case we do not want to return "22" for 10pm even though this event is normally included in Today's Day View results. Note it will still show up in $wp_query, just not in the template's rendering. Possibly override TEC's query to change it "at the source", such as using post__not_in, but beware that you should not exclude multi-day *all day* events.
-			if ( $wp_query->get( 'eventDate' ) !== date( 'Y-m-d', $event_start_timestamp ) ) {
-				// set back to what date_default_timezone_get() was
-				date_default_timezone_set( $existing_timezone );
+			$day_view_ymd = get_query_var( 'eventDate' );
 
-				return '';
+			$day_view_midnight_timestamp   = strtotime( sprintf( '%s 00:00:00', $day_view_ymd ) );
+			$day_view_end_of_day_timestamp = strtotime( sprintf( '%s 23:59:59', $day_view_ymd ) );
+
+			if ( $day_view_midnight_timestamp > $event_start_timestamp ) {
+				if ( $day_view_end_of_day_timestamp < $event_end_timestamp ) {
+					return $this->get_all_day_text();
+				} else {
+					$hour = - 1;
+				}
 			} else {
 				$hour = date( 'G', $event_start_timestamp );
-
-				// set back to what date_default_timezone_get() was
-				date_default_timezone_set( $existing_timezone );
 			}
+
+			// set back to what date_default_timezone_get() was
+			date_default_timezone_set( $existing_timezone );
 
 			foreach ( $this->get_time_of_day_ranges() as $time_of_day => $hours ) {
 				if ( in_array( $hour, $hours ) ) {
@@ -624,64 +640,6 @@ if (
 			} else {
 				return $wp_query->get( 'time_slots' )[ $time_slot ]['end'];
 			}
-		}
-
-		/**
-		 * Remove yesterday's carried-forward events (e.g. 10pm yesterday to 2am
-		 * today) from today's results.
-		 *
-		 * We have to do it this way to trigger displaying the No Events Found
-		 * notice instead of all time blocks just being empty (unexpected UX).
-		 * Note the use of `suppress_filters` to avoid causing an infinite loop
-		 * since we are already within the `posts_results` filter hook.
-		 *
-		 * @param $posts
-		 *
-		 * @return array
-		 */
-		public function remove_events_that_started_prev_day( $posts ) {
-			if ( ! tribe_is_day() ) {
-				return $posts;
-			}
-
-			$day_view_ymd = get_query_var( 'eventDate' );
-
-			$prev_day_ymd = tribe_get_previous_day_date( $day_view_ymd );
-
-			$events_that_started_prev_day = tribe_get_events( array(
-				'fields'           => 'ids',
-				'numberposts'      => - 1,
-				'posts_per_page'   => - 1,
-				'order'            => 'ASC',
-				'orderby'          => 'ID',
-				'eventDisplay'     => 'custom',
-				'start_date'       => $prev_day_ymd,
-				'end_date'         => $day_view_ymd,
-				'suppress_filters' => true,
-			) );
-
-			if (
-				! is_array( $events_that_started_prev_day )
-				|| empty( $events_that_started_prev_day )
-			) {
-				return $posts;
-			}
-
-			$posts_ids = wp_list_pluck( $posts, 'ID' );
-
-			$posts = tribe_get_events( array(
-				'numberposts'         => - 1,
-				'posts_per_page'      => - 1,
-				'order'               => 'ASC',
-				'orderby'             => 'ID',
-				'eventDisplay'        => 'custom',
-				'post__in'            => $posts_ids,
-				'post__not_in'        => $events_that_started_prev_day,
-				'ignore_sticky_posts' => true,
-				'suppress_filters'    => true,
-			) );
-
-			return $posts;
 		}
 
 		/**
