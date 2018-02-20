@@ -111,6 +111,11 @@
 	border-top-color: rgba(0, 0, 0, 0.25);
 }
 
+.tribe-events-day .tribe-events-loop .tribe-events-event-cost,
+.tribe-events-day .tribe-events-loop .tribe-event-featured .tribe-events-event-cost {
+	margin: 15px 0;
+}
+
 .tribe-events-day-group-trigger {
 	border-radius: 0;
 	width: 100%;
