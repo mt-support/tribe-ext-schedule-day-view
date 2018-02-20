@@ -97,20 +97,6 @@
 	border: 0;
 }
 
-.tribe-events-day .tribe-events-read-more {
-	font-size: 12px;
-	margin-top: 14px;
-	display: inline-block;
-	border-top: 1px solid rgba(0, 0, 0, 0.25);
-	padding-top: 8px;
-	font-weight: 600;
-	display: none;
-}
-
-.tribe-events-day .tribe-events-list .tribe-event-featured .tribe-events-read-more {
-	border-top-color: rgba(0, 0, 0, 0.25);
-}
-
 .tribe-events-day .tribe-events-loop .tribe-events-event-cost,
 .tribe-events-day .tribe-events-loop .tribe-event-featured .tribe-events-event-cost {
 	margin: 15px 0;

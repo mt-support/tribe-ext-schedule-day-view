@@ -97,13 +97,6 @@ $current_time_slot_args = Tribe__Extension__Schedule_Day_View::instance()->curre
 
 		<?php do_action( 'tribe_ext_sch_day_single_after_the_meta' ) ?>
 
-		<!-- Event Content -->
-		<?php do_action( 'tribe_ext_sch_day_single_before_the_content' ) ?>
-		<a href="<?php echo esc_url( tribe_get_event_link() ); ?>" class="tribe-events-read-more" rel="bookmark">
-			<?php esc_html_e( 'Event Details', 'tribe-ext-schedule-day-view' ) ?> &raquo;
-		</a>
-		<?php do_action( 'tribe_ext_sch_day_single_after_the_content' ); ?>
-
 	</div><!-- .tribe-events-day-event-content -->
 </div><!-- .tribe-events-day-group-event -->
 
