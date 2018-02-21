@@ -362,6 +362,8 @@ if (
 		 * Note that the hours do not exactly match the *setup* of the Time of
 		 * Day filter's get_values(), but this is setup in a way to match its
 		 * actual *results* when using this filter.
+		 * -1 is only ever manually set for an event having a start time prior
+		 * to this day.
 		 *
 		 * @see \Tribe__Events__Filterbar__Filters__Time_Of_Day::get_values()
 		 *
@@ -370,7 +372,7 @@ if (
 		protected function get_time_of_day_ranges() {
 			return array(
 				__( 'Morning', 'tribe-ext-schedule-day-view' )   => array(
-					-1, // manually set for events with a start time prior to this day
+					-1,
 					0,
 					1,
 					2,
