@@ -158,10 +158,7 @@ if (
 				$this->setup_loop();
 				$this->display_cleanup();
 
-				add_filter( 'tribe_get_events_title', array(
-					$this,
-					'set_todays_day_view_title'
-				) );
+				add_filter( 'tribe_get_events_title', array( $this, 'set_todays_day_view_title' ) );
 			}
 		}
 
