@@ -391,6 +391,8 @@ if (
 		/**
 		 * Build the data for a given time slot.
 		 *
+		 * Used in src/views/day/loop.php
+		 *
 		 * @param $time_slot
 		 */
 		public function build_current_time_slot_args( $time_slot ) {
