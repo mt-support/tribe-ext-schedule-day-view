@@ -114,14 +114,40 @@ if (
 
 			add_action( 'init', array( $this, 'register_assets' ) );
 
+			// Because of Ajax, we need to always have the assets load, not just if day view.
+			add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
+			add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'load_assets_in_day_view_shortcode' ) );
+
 			/**
 			 * Load as much as possible after $wp_query is set so we can support
 			 * displaying Schedule Day View for today only (via filter), which
 			 * we can only do after `$wp_query->get( 'eventDate' )` is set.
+			 *
+			 * We need to use the `tribe_pre_get_view` hook so that
+			 * tribe_is_day() is true as well as being able to detect the date
+			 * it is displaying even within/after Ajax.
 			 */
-			add_action( 'tribe_pre_initialize_view', array( $this, 'setup_for_day_view_archive' ) );
+			add_action( 'tribe_pre_get_view', array( $this, 'setup_for_day_view_archive' ) );
 
 			add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'setup_for_day_view_shortcode' ) );
+		}
+
+		/**
+		 * Load this view's assets in day view archive.
+		 */
+		public function load_assets_in_day_view_archive() {
+			if ( tribe_is_day() ) {
+				wp_enqueue_style( self::PREFIX );
+				wp_enqueue_script( self::PREFIX . '_js' );
+			}
+		}
+
+		/**
+		 * Load this view's assets in day view shortcode.
+		 */
+		public function load_assets_in_day_view_shortcode() {
+			wp_enqueue_style( self::PREFIX );
+			wp_enqueue_script( self::PREFIX . '_js' );
 		}
 
 		/**
@@ -160,15 +186,12 @@ if (
 			) {
 				$this->common_setup();
 
-				// Load assets for main day view archive
-				add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
-
 				add_filter( 'body_class', array( $this, 'add_container_class' ) );
 			}
 		}
 
 		/**
-		 * Load this view's assets in PRO's day view shortcode.
+		 * Loading logic for PRO's day view shortcode.
 		 */
 		public function setup_for_day_view_shortcode() {
 			$schedule_day_view_only_if_today = $this->load_only_if_today();
@@ -181,9 +204,6 @@ if (
 				)
 			) {
 				$this->common_setup();
-
-				wp_enqueue_style( self::PREFIX );
-				wp_enqueue_script( self::PREFIX . '_js' );
 
 				add_filter( 'tribe_events_pro_tribe_events_shortcode_wrapper_classes', array( $this, 'add_container_class' ) );
 			}
@@ -243,14 +263,6 @@ if (
 
 			// We don't actually use any MomentJS in this extension, but it's a way to ensure we're loading after the default The Events Calendar stuff does. Plus, we might want to do some fancier JS stuff in the future, in which case MomentJS would probably come in handy.
 			wp_register_script( self::PREFIX . '_js', $js, array( 'tribe-moment' ), $this->get_version(), true );
-		}
-
-		/**
-		 * Load this view's assets in day view archive.
-		 */
-		public function load_assets_in_day_view_archive() {
-			wp_enqueue_style( self::PREFIX );
-			wp_enqueue_script( self::PREFIX . '_js' );
 		}
 
 		/**
