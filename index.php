@@ -85,18 +85,33 @@ if (
 		 * Extension initialization and hooks.
 		 */
 		public function init() {
-			// Require PHP 5.4+ because of Closures and Short Array Syntax
-			if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
-				$message = '<p>' . $this->get_name();
+			/**
+			 * Protect against fatals by specifying the required minimum PHP
+			 * version. Make sure to match the readme.txt header.
+			 *
+			 * @link https://secure.php.net/manual/en/migration54.new-features.php
+			 * 5.4: Traits, Short Array Syntax, and $this within Closures
+			 */
+			$php_required_version = '5.4';
 
-				$message .= __( ' requires PHP 5.4 or newer to work. Please contact your website host and inquire about updating PHP.', 'tribe-extension' );
+			if ( version_compare( PHP_VERSION, $php_required_version, '<' ) ) {
+				if (
+					is_admin()
+					&& current_user_can( 'activate_plugins' )
+				) {
+					$message = '<p>' . $this->get_name() . ' ';
 
-				$message .= sprintf( ' <a href="%1$s">%1$s</a>', 'https://wordpress.org/about/requirements/' );
+					$message .= sprintf( __( 'requires PHP version %s or newer to work. Please contact your website host and inquire about updating PHP.', 'tribe-ext-schedule-day-view' ), $php_required_version );
 
-				$message .= '</p>';
+					$message .= sprintf( ' <a href="%1$s">%1$s</a>', 'https://wordpress.org/about/requirements/' );
 
-				tribe_notice( $this->get_name(), $message, 'type=error' );
+					$message .= '</p>';
 
+					tribe_notice( $this->get_name(), $message, 'type=error' );
+				}
+
+				return;
+			}
 				return;
 			}
 
