@@ -111,20 +111,58 @@ if (
 
 				return;
 			}
-				return;
-			}
 
-			$this->setup_templates();
-			$this->setup_loop();
-			$this->display_cleanup();
+			/**
+			 * Load as much as possible after $wp_query is set so we can support
+			 * displaying Schedule Day View for today only (via filter), which
+			 * we can only do after `$wp_query->get( 'eventDate' )` is set.
+			 *
+			 * This action fires when tribe_get_view() is called. All hooks that
+			 * fire earlier than this need to be within init(), not this callback.
+			 */
+			add_action( 'tribe_pre_get_view', array( $this, 'do_setup_conditioned_upon_wp_query' ) );
+
 			add_action( 'init', array( $this, 'register_assets' ) );
 
 			// Load assets for main day view archive
 			add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
+
 			// Load assets for PRO shortcode's day view
 			add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'load_assets_in_day_view_shortcode' ) );
+		}
 
-			add_filter( 'tribe_get_events_title', array( $this, 'set_todays_day_view_title' ) );
+		/**
+		 * Load Schedule Day View for all days by default or only when
+		 * displaying Today, as set by the
+		 * `tribe_ext_sch_day_view_only_if_today` boolean filter.
+		 */
+		public function do_setup_conditioned_upon_wp_query() {
+			/**
+			 * If false (default), Schedule Day View will display for every
+			 * day's Day View. If true, the normal Day View will display for
+			 * every day and Schedule Day View will only take over for Today's
+			 * Day View.
+			 *
+			 * @param bool $schedule_day_view_only_if_today
+			 */
+			$schedule_day_view_only_if_today = (bool) apply_filters( self::PREFIX . '_only_if_today', false );
+
+			if (
+				true !== $schedule_day_view_only_if_today
+				|| (
+					true === $schedule_day_view_only_if_today
+					&& $this->today()
+				)
+			) {
+				$this->setup_templates();
+				$this->setup_loop();
+				$this->display_cleanup();
+
+				add_filter( 'tribe_get_events_title', array(
+					$this,
+					'set_todays_day_view_title'
+				) );
+			}
 		}
 
 		/**
