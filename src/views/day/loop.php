@@ -18,8 +18,9 @@ global $post, $wp_query;
 $prefix = Tribe__Extension__Schedule_Day_View::PREFIX;
 
 $current_time_slot = null;
-$today             = Tribe__Extension__Schedule_Day_View::instance()->today();
-$class_is_today    = $today ? ' tribe-events-loop-day-today' : ' tribe-events-day-grouping-is-active tribe-events-loop-day-not-today';
+$php_class = Tribe__Extension__Schedule_Day_View::instance();
+$today             = $php_class->today();
+$container_class    = $php_class->array_of_container_classes_based_on_today_to_string();
 
 $all_day_text = Tribe__Extension__Schedule_Day_View::instance()->get_all_day_text();
 
@@ -28,7 +29,7 @@ $now = Tribe__Extension__Schedule_Day_View::instance()->now_timestamp();
 
 <div
 	id="tribe-events-day"
-	class="tribe-events-loop<?php echo esc_attr( $class_is_today ); ?>"
+	class="tribe-events-loop<?php echo esc_attr( $container_class ); ?>"
 	data-tribe-timezone="<?php echo esc_attr( Tribe__Events__Timezones::wp_timezone_string() ); ?>"
 	data-tribe-now="<?php echo esc_attr( $now ); ?>"
 >

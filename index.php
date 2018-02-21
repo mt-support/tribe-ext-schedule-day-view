@@ -114,8 +114,8 @@ if (
 
 			add_action( 'init', array( $this, 'register_assets' ) );
 
-			// Because of Ajax, we need to always have the assets load, not just if day view.
-			add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_everywhere_except_event_archive_that_isnt_day_view' ) );
+
 			add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'load_assets_in_day_view_shortcode' ) );
 
 			/**
@@ -133,12 +133,27 @@ if (
 		}
 
 		/**
-		 * Load this view's assets in day view archive.
+		 * Load this plugin's assets on all page loads if PRO is active except
+		 * event archives that are not day view.
 		 */
-		public function load_assets_in_day_view_archive() {
-			if ( tribe_is_day() ) {
+		public function load_assets_everywhere_except_event_archive_that_isnt_day_view() {
+			$should_enqueue = false;
+
+			if (
+				class_exists( 'Tribe__Events__Pro__Shortcodes__Tribe_Events' )
+				|| tribe_is_day() // not true for shortcode views
+			) {
+				$should_enqueue = true;
+			}
+
+			if ( true === $should_enqueue ) {
 				wp_enqueue_style( self::PREFIX );
 				wp_enqueue_script( self::PREFIX . '_js' );
+			}
+
+			// Only add body class to day view archive, not all pages.
+			if ( tribe_is_day() ) {
+				add_filter( 'body_class', array( $this, 'add_archive_body_class' ) );
 			}
 		}
 
@@ -185,8 +200,6 @@ if (
 				)
 			) {
 				$this->common_setup();
-
-				add_filter( 'body_class', array( $this, 'add_container_class' ) );
 			}
 		}
 
@@ -205,7 +218,7 @@ if (
 			) {
 				$this->common_setup();
 
-				add_filter( 'tribe_events_pro_tribe_events_shortcode_wrapper_classes', array( $this, 'add_container_class' ) );
+				add_filter( 'tribe_events_pro_tribe_events_shortcode_wrapper_classes', array( $this, 'add_shortcode_container_classes' ) );
 			}
 		}
 
@@ -221,7 +234,7 @@ if (
 		}
 
 		/**
-		 * Add the HTML class.
+		 * Add our HTML class to <body>.
 		 *
 		 * @see \Tribe__Extension__Schedule_Day_View::PREFIX
 		 *
@@ -229,9 +242,86 @@ if (
 		 *
 		 * @return array
 		 */
-		public function add_container_class( $classes ) {
+		public function add_archive_body_class( $classes ) {
 			$classes[] = self::PREFIX;
+
+			$classes = array_merge( $classes, $this->array_of_container_classes_based_on_today() );
+
 			return $classes;
+		}
+
+		/**
+		 * Add our HTML classes to the shortcode's container.
+		 *
+		 * @see \Tribe__Extension__Schedule_Day_View::PREFIX
+		 *
+		 * @param $classes
+		 *
+		 * @return array
+		 */
+		public function add_shortcode_container_classes( $classes ) {
+			$classes[] = self::PREFIX;
+
+			$classes = array_merge( $classes, $this->array_of_container_classes_based_on_today() );
+
+			return $classes;
+		}
+
+		/**
+		 * Create an array of HTML classes based on whether or not we are
+		 * viewing Today in day view.
+		 *
+		 * @return array
+		 */
+		public function array_of_container_classes_based_on_today() {
+			$classes_if_today = array( 'tribe-events-day-is-today' );
+
+			/**
+			 * Array of classes if Today.
+			 *
+			 * @param array $classes_if_today
+			 */
+			$classes_if_today = (array) apply_filters( self::PREFIX . '_classes_if_today', $classes_if_today );
+
+			$classes_if_not_today = array(
+				'tribe-events-day-grouping-is-active',
+				'tribe-events-loop-day-not-today',
+			);
+
+			/**
+			 * Array of classes if not Today.
+			 *
+			 * @param array $classes_if_not_today
+			 */
+			$classes_if_not_today = (array) apply_filters( self::PREFIX . '_classes_if_not_today', $classes_if_not_today );
+
+			if ( $this->today() ) {
+				$classes = $classes_if_today;
+			} else {
+				$classes = $classes_if_not_today;
+			}
+
+			return $classes;
+		}
+
+		/**
+		 * Build a space-separated string of escaped classes from an array of
+		 * HTML classes.
+		 *
+		 * Used in the src/views/day/loop.php template.
+		 *
+		 * @param array $array_of_container_classes
+		 *
+		 * @return string
+		 */
+		public function array_of_container_classes_based_on_today_to_string() {
+			$output = '';
+
+			foreach ( $this->array_of_container_classes_based_on_today() as $class ) {
+				$output .= sprintf( ' %s', esc_attr( $class ) );
+			}
+
+			return $output;
 		}
 
 		/**
@@ -622,12 +712,12 @@ if (
 
 		/**
 		 * Remove additional information we do not want to display in this
-		 * minimalized view.
+		 * minimalized view, such as recurrence tooltip and excess venue info.
 		 */
 		private function display_cleanup() {
 			add_filter( 'tribe_events_recurrence_tooltip', function ( $tooltip ) {
 				return '';
-			}, 10 );
+			} );
 
 			add_filter( 'tribe_get_venue_details', function ( $venue_details ) {
 				unset( $venue_details['address'] );

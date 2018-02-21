@@ -23,10 +23,9 @@
 	// @endif
 
 	$( document ).ready( function () {
-		var $container = $( '#tribe-events-day' ),
+		var $container = $( '.tribe_ext_sch_day_view #tribe-events-day' ),
 			tribe_timezone = $container.data( 'tribe-timezone' ),
 			tribe_time_on_load = $container.data( 'tribe-now' );
-
 
 		/**
 		 * @function
@@ -51,12 +50,10 @@
 			}
 		} );
 
-
 		// @ifdef DEBUG
 		dbug && debug.info( 'TEC Debug: tribe events schedule day view successfully loaded' );
 		ts.view && dbug && debug.timeEnd( 'Tribe JS Init Timer' );
 		// @endif
-
 	} );
 
 })( window, document, jQuery, tribe_ev.data, tribe_ev.events, tribe_ev.fn, tribe_ev.state, tribe_ev.tests, tribe_js_config, tribe_debug );
