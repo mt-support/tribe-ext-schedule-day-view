@@ -112,31 +112,24 @@ if (
 				return;
 			}
 
+			add_action( 'init', array( $this, 'register_assets' ) );
+
 			/**
 			 * Load as much as possible after $wp_query is set so we can support
 			 * displaying Schedule Day View for today only (via filter), which
 			 * we can only do after `$wp_query->get( 'eventDate' )` is set.
-			 *
-			 * This action fires when tribe_get_view() is called. All hooks that
-			 * fire earlier than this need to be within init(), not this callback.
 			 */
-			add_action( 'tribe_pre_get_view', array( $this, 'do_setup_conditioned_upon_wp_query' ) );
+			add_action( 'tribe_pre_initialize_view', array( $this, 'setup_for_day_view_archive' ) );
 
-			add_action( 'init', array( $this, 'register_assets' ) );
-
-			// Load assets for main day view archive
-			add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
-
-			// Load assets for PRO shortcode's day view
-			add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'load_assets_in_day_view_shortcode' ) );
+			add_action( 'tribe_events_pro_tribe_events_shortcode_prepare_day', array( $this, 'setup_for_day_view_shortcode' ) );
 		}
 
 		/**
-		 * Load Schedule Day View for all days by default or only when
-		 * displaying Today, as set by the
-		 * `tribe_ext_sch_day_view_only_if_today` boolean filter.
+		 * Should Schedule Day View load every day or just today.
+		 *
+		 * @return bool
 		 */
-		public function do_setup_conditioned_upon_wp_query() {
+		private function load_only_if_today() {
 			/**
 			 * If false (default), Schedule Day View will display for every
 			 * day's Day View. If true, the normal Day View will display for
@@ -145,7 +138,18 @@ if (
 			 *
 			 * @param bool $schedule_day_view_only_if_today
 			 */
-			$schedule_day_view_only_if_today = (bool) apply_filters( self::PREFIX . '_only_if_today', false );
+			return (bool) apply_filters( self::PREFIX . '_only_if_today', false );
+		}
+
+		/**
+		 * Loading logic for Schedule Day View event archive.
+		 */
+		public function setup_for_day_view_archive() {
+			if ( ! tribe_is_day() ) {
+				return;
+			}
+
+			$schedule_day_view_only_if_today = $this->load_only_if_today();
 
 			if (
 				true !== $schedule_day_view_only_if_today
@@ -154,12 +158,60 @@ if (
 					&& $this->today()
 				)
 			) {
-				$this->setup_templates();
-				$this->setup_loop();
-				$this->display_cleanup();
+				$this->common_setup();
 
-				add_filter( 'tribe_get_events_title', array( $this, 'set_todays_day_view_title' ) );
+				// Load assets for main day view archive
+				add_action( 'wp_enqueue_scripts', array( $this, 'load_assets_in_day_view_archive' ) );
+
+				add_filter( 'body_class', array( $this, 'add_container_class' ) );
 			}
+		}
+
+		/**
+		 * Load this view's assets in PRO's day view shortcode.
+		 */
+		public function setup_for_day_view_shortcode() {
+			$schedule_day_view_only_if_today = $this->load_only_if_today();
+
+			if (
+				true !== $schedule_day_view_only_if_today
+				|| (
+					true === $schedule_day_view_only_if_today
+					&& $this->today()
+				)
+			) {
+				$this->common_setup();
+
+				wp_enqueue_style( self::PREFIX );
+				wp_enqueue_script( self::PREFIX . '_js' );
+
+				add_filter( 'tribe_events_pro_tribe_events_shortcode_wrapper_classes', array( $this, 'add_container_class' ) );
+			}
+		}
+
+		/**
+		 * Do the things common to rendering both event archive and shortcode.
+		 */
+		private function common_setup() {
+			$this->setup_templates();
+			$this->setup_loop();
+			$this->display_cleanup();
+
+			add_filter( 'tribe_get_events_title', array( $this, 'set_todays_day_view_title' ) );
+		}
+
+		/**
+		 * Add the HTML class.
+		 *
+		 * @see \Tribe__Extension__Schedule_Day_View::PREFIX
+		 *
+		 * @param $classes
+		 *
+		 * @return array
+		 */
+		public function add_container_class( $classes ) {
+			$classes[] = self::PREFIX;
+			return $classes;
 		}
 
 		/**
@@ -197,16 +249,6 @@ if (
 		 * Load this view's assets in day view archive.
 		 */
 		public function load_assets_in_day_view_archive() {
-			if ( tribe_is_day() ) {
-				wp_enqueue_style( self::PREFIX );
-				wp_enqueue_script( self::PREFIX . '_js' );
-			}
-		}
-
-		/**
-		 * Load this view's assets in day view shortcode.
-		 */
-		public function load_assets_in_day_view_shortcode() {
 			wp_enqueue_style( self::PREFIX );
 			wp_enqueue_script( self::PREFIX . '_js' );
 		}
@@ -573,7 +615,7 @@ if (
 		private function display_cleanup() {
 			add_filter( 'tribe_events_recurrence_tooltip', function ( $tooltip ) {
 				return '';
-			}, 10, 1 );
+			}, 10 );
 
 			add_filter( 'tribe_get_venue_details', function ( $venue_details ) {
 				unset( $venue_details['address'] );
