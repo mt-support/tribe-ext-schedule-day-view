@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 global $post, $wp_query;
 
+$prefix = Tribe__Extension__Schedule_Day_View::PREFIX;
+
 $current_time_slot = null;
 $today             = Tribe__Extension__Schedule_Day_View::instance()->today();
 $class_is_today    = $today ? ' tribe-events-loop-day-today' : ' tribe-events-day-grouping-is-active tribe-events-loop-day-not-today';
@@ -33,7 +35,7 @@ $now = Tribe__Extension__Schedule_Day_View::instance()->now_timestamp();
 
 	<?php
 	// Used by Tribe__Extension__Schedule_Day_View::setup_loop()
-	do_action( 'tribe_ext_sch_day_inside_before_loop' );
+	do_action( $prefix . '_inside_before_loop' );
 	$all_time_slots = array_merge( array( $all_day_text ), array_keys( $wp_query->get( 'time_slots' ) ) );
 
 	foreach ( $all_time_slots as $current_time_slot ) :
@@ -104,7 +106,7 @@ $now = Tribe__Extension__Schedule_Day_View::instance()->now_timestamp();
 	<?php
 	endforeach;
 
-	do_action( 'tribe_ext_sch_day_inside_after_loop' );
+	do_action( $prefix . '_inside_after_loop' );
 	?>
 
 </div><!-- .tribe-events-loop -->

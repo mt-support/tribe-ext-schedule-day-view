@@ -350,7 +350,7 @@ if (
 		 * Runs on the initial action hook in the src/views/day/loop.php template.
 		 */
 		private function setup_loop() {
-			add_action( 'tribe_ext_sch_day_inside_before_loop', function () {
+			add_action( self::PREFIX . '_inside_before_loop', function () {
 				global $wp_query;
 
 				$wp_query->set( 'time_slots', $this->get_time_slots_array_of_timestamp_ranges() );
