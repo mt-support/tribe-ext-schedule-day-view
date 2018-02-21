@@ -680,6 +680,8 @@ if (
 		public function get_time_slot_timestamp( $time_slot = '', $start = true ) {
 			global $wp_query;
 
+			$wp_query_time_slots = $wp_query->get( 'time_slots' );
+
 			if (
 				empty( $time_slot )
 				|| $this->get_all_day_text() === $time_slot
@@ -688,9 +690,10 @@ if (
 			}
 
 			if ( $start ) {
-				return $wp_query->get( 'time_slots' )[ $time_slot ]['start'];
+
+				return $wp_query_time_slots[ $time_slot ]['start'];
 			} else {
-				return $wp_query->get( 'time_slots' )[ $time_slot ]['end'];
+				return $wp_query_time_slots[ $time_slot ]['end'];
 			}
 		}
 
