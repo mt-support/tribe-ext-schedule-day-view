@@ -140,7 +140,7 @@ if (
 			$should_enqueue = false;
 
 			if (
-				class_exists( 'Tribe__Events__Pro__Shortcodes__Tribe_Events' )
+				class_exists( 'Tribe__Events__Pro__Shortcodes__Tribe_Events__Day' )
 				|| tribe_is_day() // not true for shortcode views
 			) {
 				$should_enqueue = true;
@@ -351,8 +351,8 @@ if (
 			// Just making sure our CSS only loads if The Events Calendar's global CSS successfully loaded.
 			wp_register_style( self::PREFIX, $css, array( 'tribe-events-calendar-style' ), $this->get_version() );
 
-			// We don't actually use any MomentJS in this extension, but it's a way to ensure we're loading after the default The Events Calendar stuff does. Plus, we might want to do some fancier JS stuff in the future, in which case MomentJS would probably come in handy.
-			wp_register_script( self::PREFIX . '_js', $js, array( 'tribe-moment' ), $this->get_version(), true );
+			// We need to load after this not just because it sounds like the correct one but because if we're too early PRO's Day View Shortcode will throw a JS error. Basically, this is correct and we need to be correct here.
+			wp_register_script( self::PREFIX . '_js', $js, array( 'tribe-events-ajax-day' ), $this->get_version(), true );
 		}
 
 		/**
