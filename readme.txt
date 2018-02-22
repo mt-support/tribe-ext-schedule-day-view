@@ -13,9 +13,9 @@ Overrides The Events Calendar's Day View with a Schedule Day View, displaying ev
 
 == Description ==
 
-Activating this extension will replace The Events Calendar's Day View with a Schedule Day View. This is accomplished by doing a template override through a plugin instead of within your active theme.
+Activating this extension will replace The Events Calendar's Day View with a Schedule Day View. This is accomplished by doing a template override via filters instead of within your active theme.
 
-Schedule Day View displays a single day's events with the added context of All Day, Morning, Afternoon, and Evening; it also highlights events happening _right now._
+Schedule Day View displays a single day's events with the added context of All Day, Morning, Afternoon, and Evening; it also highlights the _right now_ time slots.
 
 == Installation ==
 
