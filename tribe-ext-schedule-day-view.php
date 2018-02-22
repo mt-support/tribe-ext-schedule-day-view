@@ -84,6 +84,9 @@ if (
 		 * Extension initialization and hooks.
 		 */
 		public function init() {
+			// Load plugin textdomain
+			load_plugin_textdomain( 'tribe-ext-schedule-day-view', false, basename( dirname( __FILE__ ) ) . '/languages/' );
+
 			/**
 			 * Protect against fatals by specifying the required minimum PHP
 			 * version. Make sure to match the readme.txt header.
@@ -477,14 +480,14 @@ if (
 			$event_count = $this->get_time_slot_event_count( $time_slot );
 
 			if ( 0 === $event_count ) {
-				$event_count_text = sprintf( __( '(No %s)', 'tribe-ext-schedule-day-view' ), tribe_get_event_label_plural() );
+				$event_count_text = sprintf( _x( '(No %s)', 'time slot title event count text', 'tribe-ext-schedule-day-view' ), tribe_get_event_label_plural() );
 			} elseif ( 1 === $event_count ) {
-				$event_count_text = sprintf( __( '(%d %s)', 'tribe-ext-schedule-day-view' ), $event_count, tribe_get_event_label_singular() );
+				$event_count_text = sprintf( _x( '(%d %s)', 'time slot title event count text', 'tribe-ext-schedule-day-view' ), $event_count, tribe_get_event_label_singular() );
 			} else {
-				$event_count_text = sprintf( __( '(%d %s)', 'tribe-ext-schedule-day-view' ), $event_count, tribe_get_event_label_plural() );
+				$event_count_text = sprintf( _x( '(%d %s)', 'time slot title event count text', 'tribe-ext-schedule-day-view' ), $event_count, tribe_get_event_label_plural() );
 			}
 
-			return sprintf( esc_html__( '%s %s', 'tribe-ext-schedule-day-view' ), $time_slot, $event_count_text );
+			return sprintf( esc_html_x( '%1$s %2$s', 'time slot title', 'tribe-ext-schedule-day-view' ), $time_slot, $event_count_text );
 		}
 
 		/**
