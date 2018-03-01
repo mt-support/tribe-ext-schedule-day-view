@@ -1,21 +1,21 @@
-=== [Extension Name] ===
+=== The Events Calendar Extension: Schedule Day View ===
 Contributors: ModernTribe
 Donate link: http://m.tri.be/29
 Tags: events, calendar
-Requires at least: 4.9
-Tested up to: 4.9
+Requires at least: 4.5
+Tested up to: 4.9.4
+Requires PHP: 5.4
 Stable tag: 1.0.0
 License: GPL version 3 or any later version
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Brief description of the extension.
+Overrides The Events Calendar's Day View with a Schedule Day View, displaying events within All Day, Morning, Afternoon, and Evening contexts, as well as indicating events happening right now.
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+Activating this extension will replace The Events Calendar's Day View with a Schedule Day View. This is accomplished by doing a template override via filters instead of within your active theme.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+Schedule Day View displays a single day's events with the added context of All Day, Morning, Afternoon, and Evening; it also highlights the _right now_ time slots.
 
 == Installation ==
 
@@ -40,6 +40,6 @@ tends to be very limited.
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.0.0 2018-03-02 =
 
 * Initial release

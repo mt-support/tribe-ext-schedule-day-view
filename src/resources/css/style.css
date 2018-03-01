@@ -1,0 +1,163 @@
+/**
+ * The Events Calendar Schedule Day View Stylesheet
+ *
+ * @package TribeEventsCalendarPro
+ */
+.tribe_ext_sch_day_view.tribe-events-shortcode #tribe-events-header {
+	display: none;
+}
+
+.tribe_ext_sch_day_view #tribe-events-header {
+	margin-bottom: 18px;
+}
+
+.tribe_ext_sch_day_view .tribe-event-featured .tribe-events-list-event-title {
+	margin-top: 0;
+}
+
+.tribe_ext_sch_day_view .tribe-events-list-event-title {
+	font-size: 1.25em;
+}
+
+.tribe_ext_sch_day_view .tribe-events-list-event-title:after {
+	content: '';
+	display: block;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day .tribe-events-day-time-slot h5 {
+	margin: 1px 0 0;
+	padding: 0;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day .tribe-events-day-time-slot h5 + .type-tribe_events {
+	margin-top: 0;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day .tribe-events-day-time-slot .type-tribe_events {
+	margin-left: auto;
+	margin-right: auto;
+	padding: 20px 20px 20px 17px;
+	border-left: 3px solid transparent;
+	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 0;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day .tribe-events-day-time-slot .type-tribe_events:last-child {
+	border-bottom: 0;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day .tribe-events-day-time-slot .type-tribe_events.tribe-events-last {
+	border-bottom: 0;
+}
+
+.tribe_ext_sch_day_view .tribe-event-featured {
+	margin-bottom: 0;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day-is-today .tribe-events-day-grouping-is-now button {
+	border-left: 3px solid red;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day-is-today .tribe-events-day-time-slot .type-tribe_events.tribe-events-day-grouping-event-is-active {
+	border-left-color: red;
+}
+
+.tribe_ext_sch_day_view .type-tribe_events[class*="tribe-events-venue-"] .tribe-events-event-meta {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.tribe_ext_sch_day_view .time-details {
+	padding: 0;
+	font-weight: 600;
+	font-size: 13px;
+	color: #666;
+	margin-bottom: 8px;
+}
+
+.tribe_ext_sch_day_view .tribe-event-featured .time-details {
+	color: #fff;
+}
+
+.tribe_ext_sch_day_view a:not(:hover) {
+	text-decoration: none;
+	box-shadow: none;
+	transition: none;
+}
+
+.tribe_ext_sch_day_view .tribe-events-list-event-title h2 a {
+	padding: 3px 0 2px;
+}
+
+.tribe_ext_sch_day_view .type-tribe_events .tribe-events-event-meta {
+	font-weight: 500;
+	margin-bottom: 0;
+	font-style: italic;
+	font-size: 13px;
+	margin-top: 0;
+	background-color: transparent;
+	border: 0;
+	padding: 0;
+}
+
+.tribe_ext_sch_day_view .tribe-events-list .tribe-events-venue-details {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.tribe_ext_sch_day_view .tribe-events-event-cost,
+.tribe_ext_sch_day_view .tribe-event-featured .tribe-events-event-cost {
+	margin: 15px 0;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day-group-trigger {
+	border-radius: 0;
+	width: 100%;
+	display: block;
+	text-align: left;
+	position: relative;
+	padding-right: 45px;
+	padding-left: 20px;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day-group-trigger:disabled {
+	cursor: default;
+}
+
+.tribe_ext_sch_day_view [data-tribe-grouphasevents] .tribe-events-day-group-trigger:after {
+	content: '\002b';
+	display: block;
+	position: absolute;
+	right: 0;
+	width: 40px;
+	top: 50%;
+	text-align: center;
+	line-height: 0;
+	font-size: 22px;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day-group-trigger span {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+}
+
+.tribe_ext_sch_day_view .post-tribe-events-day-group-event {
+	display: none;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day-is-today .tribe-events-day-grouping-is-active[data-tribe-grouphasevents] .post-tribe-events-day-group-event,
+.tribe_ext_sch_day_view .tribe-events-loop-day-not-today .tribe-events-day-grouping-is-active[data-tribe-grouphasevents] .post-tribe-events-day-group-event {
+	display: block;
+}
+
+.tribe_ext_sch_day_view .tribe-events-day-grouping-is-active[data-tribe-grouphasevents] .tribe-events-day-group-trigger:after {
+	content: '\002d';
+}
