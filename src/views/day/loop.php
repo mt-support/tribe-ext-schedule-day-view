@@ -93,14 +93,14 @@ $now = Tribe__Extension__Schedule_Day_View::instance()->now_timestamp();
 				</button>
 			</h5>
 			<?php
-			while ( have_posts() ) : the_post();
+			while ( have_posts() ) {
+				the_post();
 
 				$time_slot_name = Tribe__Extension__Schedule_Day_View::instance()->time_slot_name();
 				if ( $current_time_slot === $post->$time_slot_name ) {
 					tribe_get_template_part( 'day/single' );
 				}
-
-			endwhile;
+			}
 			?>
 		</div><!-- .tribe-events-day-time-slot -->
 
