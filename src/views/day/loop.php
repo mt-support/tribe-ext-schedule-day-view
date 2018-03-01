@@ -87,7 +87,7 @@ $now = Tribe__Extension__Schedule_Day_View::instance()->now_timestamp();
 					<?php echo esc_html( $current_time_slot_args['time_slot_title'] ); ?>
 					<?php
 					if ( ! empty( $current_time_slot_args['time_slot_event_count'] ) ) {
-						printf( '<span>%s</span>', esc_html__( "Toggle Group's Events", 'tribe-ext-schedule-day-view' ) );
+						echo '<span>' . esc_html__( "Toggle Group's Events", 'tribe-ext-schedule-day-view' ) . '</span>';
 					}
 					?>
 				</button>

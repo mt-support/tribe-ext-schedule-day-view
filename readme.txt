@@ -40,7 +40,6 @@ tends to be very limited.
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.0.0 2018-03-02 =
 
-* February 2018
 * Initial release

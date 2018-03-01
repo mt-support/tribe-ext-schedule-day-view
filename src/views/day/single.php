@@ -5,7 +5,7 @@
  *
  * While this plugin is active, you cannot override this template in your own theme because it's loaded via a filter from tribe_get_template_part() in this plugin's index.php.
  *
- * @version 4.5.11
+ * @version 1.0.0
  *
  */
 

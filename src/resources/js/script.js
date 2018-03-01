@@ -16,22 +16,15 @@
 	 * dbug = tribe_debug
 	 */
 
-	// @ifdef DEBUG
-	if ( dbug ) {
-
-	}
-	// @endif
-
 	$( document ).ready( function () {
-		var $container = $( '.tribe_ext_sch_day_view #tribe-events-day' ),
-			tribe_timezone = $container.data( 'tribe-timezone' ),
-			tribe_time_on_load = $container.data( 'tribe-now' );
+		var $container = $( '.tribe_ext_sch_day_view #tribe-events-day' );
+		var tribe_timezone = $container.data( 'tribe-timezone' );
+		var tribe_time_on_load = $container.data( 'tribe-now' );
 
 		/**
 		 * @function
 		 * @desc Handles toggles for event groups
 		 */
-
 		$( '#tribe-events' ).on( 'click', '.tribe-events-day-group-trigger:enabled', function ( e ) {
 			var $target = $( e.target ),
 				$parent = $target.closest( '.tribe-events-day-time-slot' ),
