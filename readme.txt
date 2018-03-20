@@ -40,6 +40,10 @@ tends to be very limited.
 
 == Changelog ==
 
+= 1.0.1 2018-03-20 =
+
+* Tweak - fixed width
+
 = 1.0.0 2018-03-02 =
 
 * Initial release

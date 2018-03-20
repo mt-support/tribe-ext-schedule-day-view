@@ -3,6 +3,11 @@
  *
  * @package TribeEventsCalendarPro
  */
+
+.tribe_ext_sch_day_view #tribe-events-pg-template {
+	width: 100%;
+}
+
 .tribe_ext_sch_day_view.tribe-events-shortcode #tribe-events-header {
 	display: none;
 }
