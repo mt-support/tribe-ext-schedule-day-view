@@ -40,7 +40,7 @@ tends to be very limited.
 
 == Changelog ==
 
-= 1.0.1 2018-03-14 =
+= 1.0.1 2018-03-20 =
 
 * Tweak - fixed width
 
