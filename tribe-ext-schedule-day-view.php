@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     The Events Calendar Extension: Schedule Day View
  * Description:     Overrides The Events Calendar's Day View with a Schedule Day View, displaying events within All Day, Morning, Afternoon, Evening, and Night time slots, as well as indicating events happening right now.
- * Version:         1.0.0
+ * Version:         1.0.1
  * Extension Class: Tribe__Extension__Schedule_Day_View
  * Author:          Modern Tribe, Inc.
  * Author URI:      http://m.tri.be/1971
